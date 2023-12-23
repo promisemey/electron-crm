@@ -1,0 +1,24 @@
+{
+  "extends": "@electron-toolkit/tsconfig/tsconfig.web.json",
+  "include": [
+    "src/renderer/src/env.d.ts",
+    "src/renderer/src/**/*",
+    "src/renderer/src/**/*.ts",
+    "src/renderer/src/**/*.vue",
+    "src/preload/*.d.ts",
+    "auto-imports.d.ts",
+		"Element-puls.d.ts"
+  ],
+  "compilerOptions": {
+    "composite": true,
+    "baseUrl": ".",
+    "paths": {
+      "@*": [
+        "src/renderer/src/*"
+      ],
+      "@renderer/*": [
+        "src/renderer/src/*"
+      ]
+    }
+  }
+}
