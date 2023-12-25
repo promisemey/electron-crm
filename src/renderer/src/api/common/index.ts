@@ -4,6 +4,8 @@ import {
   GetCaptchaResType,
   GetDyCaptchaPayloadType,
   GetDyCaptchaResType,
+  GetMenuResType,
+  GetUserInfoResType,
   PostPhonePayloadType,
   PostPhoneResType,
   PostUserPayloadType,
@@ -31,4 +33,14 @@ export const postPhoneLoginApi = (param: PostPhonePayloadType) => {
 
 export const getDyCaptchaLoginApi = (param: GetDyCaptchaPayloadType) => {
   return request.get<GetDyCaptchaResType>('/captcha/sendRegisterOrLoginCaptcha', param)
+}
+
+// 用户信息
+export const getUserInfoApi = () => {
+  return request.get<GetUserInfoResType>('/personal/getInfo')
+}
+
+// 路由信息
+export const getMenuInfoApi = (rolePerm: string) => {
+  return request.get<GetMenuResType>(`/personal/getRouters/${rolePerm}`)
 }

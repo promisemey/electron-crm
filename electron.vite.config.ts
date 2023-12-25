@@ -18,7 +18,10 @@ export default defineConfig({
         '@renderer': resolve('src/renderer/src'),
         '@components': resolve('src/renderer/src/components'),
         '@assets': resolve('src/renderer/src/assets'),
-        '@api': resolve('src/renderer/src/api')
+        '@api': resolve('src/renderer/src/api'),
+        '@store': resolve('src/renderer/src/store'),
+        '@hooks': resolve('src/renderer/src/hooks'),
+        '@router': resolve('src/renderer/src/router')
       }
     },
     plugins: [

@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import MoveWindows from '@components/MoveWindows.vue'
-import passwordForm from './components/passwordForm.vue'
-import phoneForm from './components/phoneForm.vue'
+import PasswordForm from './components/PasswordForm.vue'
+import PhoneForm from './components/PhoneForm.vue'
 
 // import electron from 'electron'
 
@@ -47,7 +47,7 @@ const onListWindow = () => {
         </div>
         <div class="login_adv__mask"></div>
         <div class="login_adv__imgage">
-          <img src="../../assets/images/data.png" width="100%" @dragstart.prevent />
+          <img src="@assets/images/data.png" width="100%" @dragstart.prevent />
         </div>
         <div class="login_adv__bottom">{{ $t('login.versions') }}</div>
       </div>
@@ -59,15 +59,16 @@ const onListWindow = () => {
           <div class="login-header">
             <div class="login-img">
               <img src="@assets/svg/logo.svg" @dragstart.prevent />
-
               <label>{{ $t('login.systemName') }}</label>
             </div>
           </div>
           <el-tabs :before-leave="onLeave" class="h-[330px]">
             <el-tab-pane :label="$t('login.accountLogin')"
-              ><passwordForm ref="account" />
+              ><PasswordForm ref="account" />
             </el-tab-pane>
-            <el-tab-pane :label="$t('login.mobileLogin')"><phoneForm ref="phone" /></el-tab-pane>
+            <el-tab-pane :label="$t('login.mobileLogin')">
+              <PhoneForm ref="phone" />
+            </el-tab-pane>
             <el-tab-pane label="子页面">
               <el-button type="primary" size="default" @click="onListWindow">子页面</el-button>
             </el-tab-pane>

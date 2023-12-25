@@ -5,6 +5,8 @@ import type { PostPhonePayloadType } from '@api/common/types'
 import { getDyCaptchaLoginApi, postPhoneLoginApi } from '@api/common/index'
 import { Encrypt } from '@renderer/utils/aes'
 import { useI18n } from 'vue-i18n'
+import { useLogin } from '@hooks/useLogin'
+
 const { t } = useI18n() // use as global scope
 // 变量
 const isLoding = ref<boolean>(false)
@@ -28,6 +30,7 @@ const validatorTel = (rule: any, value: string, callback: any) => {
 }
 // 校验规则
 const validatorSms = (rule: any, value: string, callback: any) => {
+  console.log(rule)
   if (value === '') {
     callback(new Error(t('login.smsError')))
   } else {
@@ -70,11 +73,8 @@ const postCaptchaLogin = async () => {
     mobile: Encrypt(ruleForm.mobile),
     captcha: Encrypt(ruleForm.captcha)
   })
-  console.log(res)
-  isLoding.value = false
-  if (res.code != 200) return ElMessage.error(res.msg)
-  ElMessage.success(res.msg)
-  return
+
+  useLogin(res)
 }
 
 // 登录

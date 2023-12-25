@@ -7,6 +7,8 @@ import { createPinia } from 'pinia'
 // 如果您正在使用CDN引入，请删除下面一行。
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
+import './permission'
+
 //国际化
 import i18n from './locales/index'
 
@@ -16,7 +18,7 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 }
 
 // 状态管理
-app.use(router)
 app.use(createPinia())
+app.use(router)
 app.use(i18n)
 app.mount('#app')

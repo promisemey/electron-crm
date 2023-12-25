@@ -2,13 +2,15 @@ import { app, shell, BrowserWindow, ipcMain, screen } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-
+import { Context } from './types'
 function createWindow(): void {
   const bounds = screen.getPrimaryDisplay().bounds
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: bounds.width - 300,
-    height: bounds.height - 100,
+    width: 1050,
+    height: 700,
+    minWidth: 1050,
+    minHeight: 700,
     resizable: false,
     show: false,
     frame: false,
@@ -27,6 +29,20 @@ function createWindow(): void {
     mainWindow.show()
   })
 
+  // 调整窗口
+  ipcMain.handle('resize-frame', () => {
+    // // 重新设置窗口大小
+    // mainWindow.setSize(1050, 700)
+
+    // 居中
+    mainWindow.center()
+    // 可调整大小
+    mainWindow.setResizable(true)
+    // 窗口最小值 在调整大小之后设置
+    mainWindow.setMinimumSize(1050, 700)
+  })
+
+  mainWindow.webContents.openDevTools()
   /** 窗口移动功能封装 */
   // 窗口移动 位置刷新定时器
   let movingInterval: null | NodeJS.Timeout = null
@@ -77,14 +93,6 @@ function createWindow(): void {
     }
   })
 
-  interface Context {
-    allowQuitting: boolean
-    isShow: boolean
-    listWindow: null | BrowserWindow
-    width: number
-    height: number
-  }
-
   // 子窗口对象
   const context: Context = {
     allowQuitting: false, // 是否退出
@@ -129,19 +137,18 @@ function createWindow(): void {
     }
   }
 
+  // 隐藏
   const hide = () => {
     context.listWindow?.hide()
     context.isShow = false
   }
-
+  // 显示
   const show = () => {
     context.listWindow?.show()
     context.isShow = true
   }
 
-  // if()
-
-  // 接收渲染程序通信
+  // 创建子页面
   ipcMain.handle('new-list', () => {
     // console.log(context.listWindow?.isDestroyed())
     if (context.listWindow !== null) {
@@ -152,9 +159,9 @@ function createWindow(): void {
     }
   })
 
+  // 关闭窗口
   ipcMain.on('list-close', () => {
     if (context.allowQuitting == false) {
-      // hide()
       // context.listWindow?.isDestroyed()  // 判断是否销毁
       context.listWindow?.destroy() // 销毁
       context.listWindow = null
@@ -163,13 +170,14 @@ function createWindow(): void {
     }
   })
 
+  // 退出程序
+  ipcMain.on('exit-app', () => {
+    app.exit()
+  })
+
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
     return { action: 'deny' }
-  })
-
-  ipcMain.on('exit-app', () => {
-    app.exit()
   })
 
   // HMR for renderer base on electron-vite cli.

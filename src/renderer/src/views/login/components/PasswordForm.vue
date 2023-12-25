@@ -5,6 +5,7 @@ import type { PostUserPayloadType } from '@api/common/types'
 import { getCaptchaApi, postUserLoginApi } from '@api/common/index'
 import { Encrypt } from '@renderer/utils/aes'
 import { useI18n } from 'vue-i18n'
+import { useLogin } from '@hooks/useLogin'
 
 const { t } = useI18n() // use as global scope
 // 变量
@@ -13,13 +14,12 @@ const captchaUrl = ref<string>('')
 const isLoding = ref<boolean>(false)
 const ruleFormRef = ref<FormInstance>()
 const ruleForm = reactive<PostUserPayloadType>({
-  password: '', //密码（需要使用AES加密）
-  username: '', //用户名（需要使用AES加密）
+  username: 'admin', //用户名（需要使用AES加密）
+  password: 'abc123456', //密码（需要使用AES加密）
   key: '', //图形验证码中随机UUID
   captcha: ''
 })
-console.log(t('login.userError', 'Default error message'))
-// console.log(app.config)
+
 // 校验规则
 // const
 
@@ -38,9 +38,9 @@ const getCaptcha = async () => {
 
   const res = await getCaptchaApi({ key })
 
+  // 转换为链接
   const blob = new Blob([res], { type: 'application/vnd.ms-excel' })
   captchaUrl.value = URL.createObjectURL(blob)
-  console.log(0)
 }
 
 // 账号登录接口
@@ -51,9 +51,20 @@ const postlogin = async () => {
     password: Encrypt(ruleForm.password)
   })
   isLoding.value = false
-  if (res.code != 200) return ElMessage.error(res.msg)
-  console.log('登录', res)
-  return ElMessage.success(res.msg)
+  useLogin(res)
+  // if (res.code != 200) return ElMessage.error(res.msg)
+
+  // const token = res.data
+
+  // // 持久化存储
+  // localStorage.setItem('token', token || '')
+
+  // // 获取用户信息
+  // await useUserStore().getUserInfo()
+  // // 获取菜单数据
+  // await useMenuStore().getMenuInfo()
+  // router.push('/admin')
+  // return ElMessage.success(res.msg)
 }
 
 const onChangeCaptCha = () => {
@@ -79,7 +90,7 @@ const resetForm = (formEl: FormInstance | undefined) => {
 
   formEl.resetFields()
 }
-// const reset = resetForm(ruleFormRef)
+
 onBeforeMount(() => {
   getCaptcha()
 })
@@ -89,13 +100,6 @@ defineExpose({
   ruleFormRef,
   resetForm
 })
-// onUnmounted(() => {
-//   console.log('我走啦')
-// })
-// const resetForm = (formEl: FormInstance | undefined) => {
-//   if (!formEl) return
-//   formEl.resetFields()
-// }
 </script>
 <template>
   <div class="password_form">
