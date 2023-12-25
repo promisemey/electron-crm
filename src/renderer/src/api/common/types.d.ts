@@ -115,7 +115,11 @@ interface Meta {
   icon: string //图标
   noCache: boolean //是否缓存
   link: null | string //外链
+  affix: false
+  hidden: true
 }
+
+interface Children extends Menu {}
 
 interface Menu {
   id: string //ID
@@ -130,8 +134,6 @@ interface Menu {
   parentView: string
   children: Children[]
 }
-
-interface Children extends Menu {}
 
 export interface GetMenuResType extends PostUserResType {
   data: Menu[]

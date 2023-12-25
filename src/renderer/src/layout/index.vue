@@ -6,7 +6,7 @@ import MenuItem from './components/menu/MenuItem.vue'
 import Logo from '@components/Logo.vue'
 // 调整窗口大小
 onBeforeMount(() => {
-  window.electron.ipcRenderer.invoke('resize-frame')
+  // window.electron.ipcRenderer.invoke('resize-frame')
 })
 </script>
 

@@ -1,11 +1,23 @@
 <script lang="ts" setup>
 import { useMenuStore } from '@store/menuStore'
 import { storeToRefs } from 'pinia'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+// const route = useRoute()
 
 // 菜单数据
 const menuStore = useMenuStore()
-const { defaultActive, childDefaultActive, childMenu, currentMenu, isCollapse } =
-  storeToRefs(menuStore)
+const { childDefaultActive, childMenu, currentMenu, isCollapse } = storeToRefs(menuStore)
+
+const onChangeRoutes = (path: string) => {
+  childDefaultActive.value = path
+  // if(path.includes('channel-'))
+  if (path.includes('channel-')) path = path.replace('/channel-', '')
+
+  router.push(path)
+}
 </script>
 <template>
   <div class="menu-item">
@@ -22,8 +34,10 @@ const { defaultActive, childDefaultActive, childMenu, currentMenu, isCollapse } 
           :default-active="childDefaultActive"
           :collapse="!isCollapse"
         >
-          <template v-for="item in childMenu" :key="`${defaultActive}-${item.id}`">
-            <el-menu-item :index="`${defaultActive}-${item.id}`" class="">
+          {{ childDefaultActive }}
+          <!-- <template v-for="item in childMenu" :key="`${defaultActive}-${item.id}`"> -->
+          <template v-for="item in childMenu" :key="item.id">
+            <el-menu-item :index="item.path" @click="onChangeRoutes(item.path)">
               <el-icon>
                 <component :is="item.meta.icon.replace('el-icon-', '') || 'user'"></component>
               </el-icon>
