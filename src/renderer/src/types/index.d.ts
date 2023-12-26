@@ -26,3 +26,10 @@ interface ChildItem extends RoutesItem {}
 interface extensionMeta extends RouteLocationNormalizedLoaded {
   meta: Meta
 }
+
+// 标签页
+interface TabsType {
+  title: string
+  name: string
+  path: string
+}

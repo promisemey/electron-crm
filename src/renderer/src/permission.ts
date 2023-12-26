@@ -27,12 +27,13 @@ router.beforeEach((to, from, next) => {
     if (!token) {
       next('/login')
     } else {
-      // 如果没有匹配到路径
       getMenuInfo()
+      // 如果没有匹配到路径
       if (!to.redirectedFrom) {
         // getMenuInfo()
         // console.log('1', router.getRoutes())
-        next({ ...to })
+        // 解决 replace: true  electron 首屏白屏
+        next({ ...to, replace: true })
         // next()
       } else {
         // console.log(2, router.getRoutes())

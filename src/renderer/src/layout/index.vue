@@ -1,21 +1,29 @@
 <script lang="ts" setup>
 import MoveWindows from '@components/MoveWindows.vue'
-import { onBeforeMount } from 'vue'
+import { onBeforeMount, ref } from 'vue'
 import PrimaryMenu from './components/menu/PrimaryMenu.vue'
 import MenuItem from './components/menu/MenuItem.vue'
 import Logo from '@components/Logo.vue'
+import BreadCrums from './components/navbar/BreadCrums.vue'
+import Tools from './components/navbar/Tools.vue'
+import TagsMenu from './components/navbar/TagsMenu.vue'
 // 调整窗口大小
 onBeforeMount(() => {
   // window.electron.ipcRenderer.invoke('resize-frame')
 })
+
+const tagMenuRef = ref()
+
+console.log(tagMenuRef)
 </script>
 
 <template>
   <MoveWindows>
     <div class="layout w-full h-full flex overflow-hidden">
+      <!-- 菜单区域 -->
       <div class="left w-[240px] flex">
         <!-- 一级菜单 -->
-        <div class="w-16 bg-gray-200">
+        <div class="w-16">
           <div class="h-16 flex justify-center items-center">
             <div class="w-9 h-9">
               <Logo />
@@ -28,18 +36,41 @@ onBeforeMount(() => {
 
         <!-- 二级菜单 -->
         <div class="flex-1">
-          <MenuItem />
+          <MenuItem :tag="tagMenuRef" />
         </div>
         <!-- 二级菜单 -->
       </div>
+      <!-- 菜单区域 -->
 
       <!-- 内容区 -->
-      <div class="right flex-1">
+      <div class="right flex-1 overflow-hidden">
+        <!-- navbar -->
+        <div class="px-5 h-14 items-center border-b-[1px] flex justify-between">
+          <!-- 面包屑 -->
+          <BreadCrums />
+          <!-- 面包屑 -->
+          <!-- <el-button type="primary" size="default" @click="addTab"></el-button> -->
+
+          <!-- 工具 -->
+          <Tools class="drop-shadow-none" />
+          <!-- 工具 -->
+        </div>
+        <!-- navbar -->
+
+        <!-- tag -->
+        <TagsMenu ref="tagMenuRef" />
+        <!-- tag -->
+
         <router-view />
       </div>
+
       <!-- 内容区 -->
     </div>
   </MoveWindows>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.el-tabs--border-card {
+  border: none;
+}
+</style>

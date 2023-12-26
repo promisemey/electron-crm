@@ -1,32 +1,42 @@
 <script lang="ts" setup>
 import { onBeforeMount } from 'vue'
 import { useMenuStore } from '@store/menuStore'
-import { useRoute, useRouter } from 'vue-router'
-
-const router = useRouter()
+import { useRoute } from 'vue-router'
+import { useSelectMenu } from '@hooks/useSelectMenu'
+// const router = useRouter()
 // 菜单数据
 const menuStore = useMenuStore()
 const route = useRoute()
 
 // 查找二级菜单
 const onClickMenu = (active) => {
-  // if (route.path.includes(active.index)) return
-  // 更新二级数据
-
-  const menuItem = menuStore.menuInfo.find((item) => item.path == active.index)
-
-  const childData = menuItem?.children
-
-  if (childData?.length) {
-    menuStore.childMenu = childData
-    Object.assign(childData.values, childData)
-    menuStore.defaultActive = active.index
-
-    menuStore.childDefaultActive = childData[0].path + childData[0].meta.title
-    menuStore.currentMenu = menuItem?.meta.title
-    router.push(childData[0].path)
-  }
+  useSelectMenu(active)
 }
+
+// const onClickMenu = (active) => {
+//   // if (route.path.includes(active.index)) return
+//   // 更新二级数据
+
+//   const menuItem = menuStore.menuInfo.find((item) => item.path == active.index)
+
+//   const childData = menuItem?.children
+
+//   if (childData?.length) {
+//     menuStore.childMenu = childData
+//     Object.assign(childData.values, childData)
+//     menuStore.defaultActive = active.index
+
+//     menuStore.childDefaultActive = childData[0].path + childData[0].meta.title
+//     menuStore.currentMenu = menuItem?.meta.title
+
+//     // 跳转二级首项
+//     let routePath = childData[0].path
+
+//     if (active.index === '/logger') routePath = active.index + routePath
+
+//     router.push(routePath)
+//   }
+// }
 
 onBeforeMount(() => {
   const res = route.fullPath.split('/')[1].replace('', '/')
@@ -49,28 +59,25 @@ onBeforeMount(() => {
 })
 </script>
 <template>
-  <div class="primary-menu">
+  <div class="primary-menu shadow-lg h-full">
     <el-menu
       class="!border-none !bg-transparent"
       :default-active="menuStore.defaultActive"
       :collapse="menuStore.isCollapse"
       router
     >
-      <el-menu-item
-        v-for="menu in menuStore.menuInfo"
-        :key="menu.id"
-        :index="menu.path"
-        @click="onClickMenu"
-      >
-        <el-icon class="m-0">
-          <component :is="menu.meta.icon.replace('el-icon-', '')"></component>
-        </el-icon>
-        <template #title>
-          <span class="bg-pink">
-            {{ menu.name }}
-          </span>
-        </template>
-      </el-menu-item>
+      <template v-for="menu in menuStore.menuInfo" :key="menu.id">
+        <el-menu-item v-if="menu.meta.title !== '小鹿线'" :index="menu.path" @click="onClickMenu">
+          <el-icon class="m-0">
+            <component :is="menu.meta.icon.replace('el-icon-', '')"></component>
+          </el-icon>
+          <template #title>
+            <span class="bg-pink">
+              {{ menu.name }}
+            </span>
+          </template>
+        </el-menu-item>
+      </template>
     </el-menu>
   </div>
 </template>
