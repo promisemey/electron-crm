@@ -1,4 +1,4 @@
-import { Menu } from '@api/common/types'
+import { Menu, Meta } from '@api/common/types'
 
 type OmitMenuType = Omit<Menu, 'meta' | 'children'>
 type OmitMenuMoreType = Omit<OmitMenuType, 'query' | 'id' | 'hidden' | 'alwaysShow'>
@@ -19,4 +19,10 @@ interface RoutesItem extends OmitMenuMoreType {
   meta: MetaType
 }
 
+// route meta类型扩展
+
 interface ChildItem extends RoutesItem {}
+
+interface extensionMeta extends RouteLocationNormalizedLoaded {
+  meta: Meta
+}

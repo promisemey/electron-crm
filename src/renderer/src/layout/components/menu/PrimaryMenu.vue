@@ -1,80 +1,67 @@
 <script lang="ts" setup>
 import { onBeforeMount } from 'vue'
 import { useMenuStore } from '@store/menuStore'
-import { storeToRefs } from 'pinia'
-import { useRouter, useRoute } from 'vue-router'
-import { watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+
 const router = useRouter()
 // 菜单数据
 const menuStore = useMenuStore()
-
-const { menuInfo, defaultActive, childDefaultActive, childMenu, currentMenu, isCollapse } =
-  storeToRefs(menuStore)
-// defaultActive.value = menuInfo.value[0].id
-
-interface Active {
-  index: string
-}
 const route = useRoute()
+
 // 查找二级菜单
-const onClickMenu = (active: Active) => {
-  if (route.path.includes(defaultActive.value)) return
+const onClickMenu = (active) => {
+  // if (route.path.includes(active.index)) return
+  // 更新二级数据
 
-  // 清空原二级菜单
-  childMenu.value.length = 0
+  const menuItem = menuStore.menuInfo.find((item) => item.path == active.index)
 
-  // const parentId = typeof active === 'object' ? active.index : active
-  defaultActive.value = active.index
+  const childData = menuItem?.children
 
-  const parentIndex = menuInfo.value.findIndex((menuChild) => menuChild.path === active.index)
-  // 当前一级菜单
-  // currentMenu.value = menuInfo.value[parentIndex].name
-  currentMenu.value = menuInfo.value[parentIndex].name
+  if (childData?.length) {
+    menuStore.childMenu = childData
+    Object.assign(childData.values, childData)
+    menuStore.defaultActive = active.index
 
-  // 拷贝二级菜单
-  Object.assign(childMenu.value, menuInfo.value[parentIndex].children)
-
-  // 二级菜单默认选中
-  childDefaultActive.value = `${childMenu.value[0].path}`
-
-  console.log(childDefaultActive)
-  // router.push(childDefaultActive.value)
+    menuStore.childDefaultActive = childData[0].path + childData[0].meta.title
+    menuStore.currentMenu = menuItem?.meta.title
+    router.push(childData[0].path)
+  }
 }
-
-watch(defaultActive, (nVal) => {
-  // console.log(nVal)
-  // menuInfo.value.forEach((item) => {
-
-  console.log(nVal)
-
-  // if (route.path.includes(item.path)) {
-  //   childMenu.value = item.children
-  //   defaultActive.value = item.path
-  //   childDefaultActive.value = childMenu.value[0].path
-
-  //   return
-  // }
-  // })
-  // onClickMenu({ index: defaultActive.value })
-})
 
 onBeforeMount(() => {
-  console.log(route)
   const res = route.fullPath.split('/')[1].replace('', '/')
-  defaultActive.value = res
-  // onClickMenu({ index: '/home' })
+  menuStore.defaultActive = res
+
+  // 解决 仪表盘页面刷新 一级选中丢失问题
+  if (route.fullPath == '/dashboard') menuStore.defaultActive = '/home'
+
+  // 二级菜单 初始数据
+  menuStore.childMenu = route.matched[1].children as any
+
+  // 解决  渠道（账号 管理） 刷新都选中问题
+  // let title: null | string = null
+  // if (res[1] && res[1] === '/channel') title = localStorage.getItem('title')
+
+  // 二级默认选中
+  menuStore.childDefaultActive = route.fullPath + route.meta.title
+  // 一级菜单 标题
+  menuStore.currentMenu = route.matched[1].meta.title
 })
 </script>
 <template>
   <div class="primary-menu">
     <el-menu
       class="!border-none !bg-transparent"
-      :default-active="defaultActive"
-      :collapse="isCollapse"
+      :default-active="menuStore.defaultActive"
+      :collapse="menuStore.isCollapse"
       router
     >
-      {{ defaultActive }}
-      <el-menu-item v-for="menu in menuInfo" :key="menu.id" :index="menu.path" @click="onClickMenu">
+      <el-menu-item
+        v-for="menu in menuStore.menuInfo"
+        :key="menu.id"
+        :index="menu.path"
+        @click="onClickMenu"
+      >
         <el-icon class="m-0">
           <component :is="menu.meta.icon.replace('el-icon-', '')"></component>
         </el-icon>

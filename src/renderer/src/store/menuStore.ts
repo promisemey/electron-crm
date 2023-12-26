@@ -2,9 +2,10 @@ import { getMenuInfoApi } from '@api/common'
 import { defineStore, storeToRefs } from 'pinia'
 import { useUserStore } from './userStore'
 import { reactive, ref } from 'vue'
-import { Menu } from '@api/common/types'
+import { Children, Menu } from '@api/common/types'
 import { ComponentViews, ResetMenu, RoutesItem } from '@types'
 import router from '@router'
+// import { RouteRecordRaw } from 'vue-router'
 
 export const useMenuStore = defineStore('menuStore', () => {
   const localMenu = localStorage.getItem('menu')
@@ -12,12 +13,12 @@ export const useMenuStore = defineStore('menuStore', () => {
   const menuInfo = reactive<Menu[]>(localMenu ? JSON.parse(localMenu) : [])
 
   // 二级菜单
-  const childMenu = reactive<Menu[]>([])
+  const childMenu = reactive<Children[]>([])
   const defaultActive = ref('/home')
   // 二级菜单  默认选中该
   const childDefaultActive = ref<string>('')
   // 一级标题
-  const currentMenu = ref<string>('')
+  const currentMenu = ref<unknown>('')
   const isCollapse = ref<boolean>(true)
 
   // 本地路由信息
