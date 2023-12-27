@@ -68,7 +68,7 @@ onBeforeMount(() => {
     <el-menu
       class="!border-none !bg-transparent"
       :default-active="menuStore.defaultActive"
-      :collapse="menuStore.isCollapse"
+      :collapse="true"
       router
     >
       <template v-for="menu in menuStore.dyRoutes" :key="menu.id">

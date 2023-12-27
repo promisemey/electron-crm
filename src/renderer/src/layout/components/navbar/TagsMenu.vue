@@ -81,11 +81,11 @@ const onJump = (path: string) => {
 }
 </script>
 <template>
-  <div class="h-10 w-full overflow-hidden">
+  <div class="h-[38px] w-full overflow-hidden drop-shadow-xl border-l-[1px]">
     <el-tabs
       v-model="editableTabsValue"
       type="border-card"
-      class="h-full"
+      class="h-full !border-none"
       @tab-change="onJump"
       @tab-remove="removeTab"
     >
@@ -102,4 +102,8 @@ const onJump = (path: string) => {
   </div>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.el-tabs--border-card {
+  border: none;
+}
+</style>

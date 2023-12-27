@@ -26,7 +26,7 @@ console.log(tagMenuRef)
   <MoveWindows>
     <div class="layout w-full h-full flex overflow-hidden">
       <!-- 菜单区域 -->
-      <div class="left w-[240px] flex">
+      <div class="left flex">
         <!-- 一级菜单 -->
         <div class="w-16">
           <div class="h-16 flex justify-center items-center">
@@ -40,15 +40,15 @@ console.log(tagMenuRef)
         <!-- 一级菜单 -->
 
         <!-- 二级菜单 -->
-        <div class="flex-1">
-          <MenuItem :tag="tagMenuRef" />
+        <div class="flex-1 !transition-all">
+          <MenuItem />
         </div>
         <!-- 二级菜单 -->
       </div>
       <!-- 菜单区域 -->
 
       <!-- 内容区 -->
-      <div class="right flex-1 overflow-hidden">
+      <div class="right flex-1 flex flex-col overflow-hidden">
         <!-- navbar -->
         <div class="px-5 h-14 items-center border-b-[1px] flex justify-between">
           <!-- 面包屑 -->
@@ -66,7 +66,18 @@ console.log(tagMenuRef)
         <TagsMenu ref="tagMenuRef" />
         <!-- tag -->
 
-        <router-view />
+        <!-- main -->
+
+        <main class="flex-1 h-full overflow-hidden m-4 drop-shadow-lg">
+          <el-card shadow="always" class="h-full" body-class="h-full">
+            <el-scrollbar>
+              <router-view />
+              <div v-for="item in 100" :key="item">{{ item }}</div>
+            </el-scrollbar>
+          </el-card>
+        </main>
+
+        <!-- main -->
       </div>
 
       <!-- 内容区 -->

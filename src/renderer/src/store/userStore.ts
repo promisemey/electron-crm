@@ -16,6 +16,7 @@ export const useUserStore = defineStore('userStore', () => {
   // 角色权限
   const rolePerm = ref(localRolePerm ?? '')
 
+  // 获取用户数据
   const getUserInfo = async () => {
     const res = await getUserInfoApi()
     if (res.code == 200) {
@@ -23,6 +24,7 @@ export const useUserStore = defineStore('userStore', () => {
         data: { userInfo: info, roles }
         // data: { userInfo: info, roles, wechat, permissions, units }
       } = res
+
       Object.assign(userInfo, info)
       Object.assign(role, roles)
       rolePerm.value = role[0].rolePerm

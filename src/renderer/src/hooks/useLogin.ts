@@ -15,7 +15,7 @@ export const useLogin = async (res) => {
   await useUserStore().getUserInfo()
   // 获取菜单数据
   await useMenuStore().getMenuInfo()
-  ElMessage.success(res.msg)
+
   router.push('/')
   return
 }

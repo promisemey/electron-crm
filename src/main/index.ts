@@ -29,6 +29,13 @@ function createWindow(): void {
     mainWindow.show()
   })
 
+  // 退出登录
+  ipcMain.handle('user-logout', () => {
+    mainWindow.setSize(1050, 700)
+    mainWindow.resizable = false
+    mainWindow.center()
+  })
+
   // 调整窗口
   ipcMain.handle('resize-frame', () => {
     // // 重新设置窗口大小
@@ -173,6 +180,17 @@ function createWindow(): void {
   // 退出程序
   ipcMain.on('exit-app', () => {
     app.exit()
+  })
+
+  // 最小化
+  ipcMain.handle('win-min', () => {
+    mainWindow.minimize()
+  })
+
+  // 全屏
+  ipcMain.handle('win-full', () => {
+    const isFull = mainWindow.isFullScreen()
+    mainWindow.setFullScreen(!isFull)
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {

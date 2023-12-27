@@ -3,7 +3,7 @@ import { onBeforeMount, reactive, ref } from 'vue'
 import { type FormInstance, type FormRules } from 'element-plus'
 import type { PostUserPayloadType } from '@api/common/types'
 import { getCaptchaApi, postUserLoginApi } from '@api/common/index'
-import { Encrypt } from '@renderer/utils/aes'
+import { Decrypt, Encrypt } from '@renderer/utils/aes'
 import { useI18n } from 'vue-i18n'
 import { useLogin } from '@hooks/useLogin'
 
@@ -14,15 +14,13 @@ const captchaUrl = ref<string>('')
 const isLoding = ref<boolean>(false)
 const ruleFormRef = ref<FormInstance>()
 const ruleForm = reactive<PostUserPayloadType>({
-  username: 'admin', //用户名（需要使用AES加密）
-  password: 'abc123456', //密码（需要使用AES加密）
+  username: '', //用户名（需要使用AES加密）
+  password: '', //密码（需要使用AES加密）
   key: '', //图形验证码中随机UUID
   captcha: ''
 })
 
 // 校验规则
-// const
-
 const rules = reactive<FormRules<PostUserPayloadType>>({
   username: [{ required: true, message: t('login.userError'), trigger: 'change' }],
   password: [{ required: true, message: t('login.PWError'), trigger: 'change' }],
@@ -45,26 +43,22 @@ const getCaptcha = async () => {
 
 // 账号登录接口
 const postlogin = async () => {
+  const account = { username: Encrypt(ruleForm.username), password: Encrypt(ruleForm.password) }
+
   const res = await postUserLoginApi({
     ...ruleForm,
-    username: Encrypt(ruleForm.username),
-    password: Encrypt(ruleForm.password)
+    ...account
   })
   isLoding.value = false
+
+  // 记住密码
+  if (isRemember.value) {
+    localStorage.setItem('reme_tut', JSON.stringify(account))
+  } else {
+    localStorage.removeItem('reme_tut')
+  }
+
   useLogin(res)
-  // if (res.code != 200) return ElMessage.error(res.msg)
-
-  // const token = res.data
-
-  // // 持久化存储
-  // localStorage.setItem('token', token || '')
-
-  // // 获取用户信息
-  // await useUserStore().getUserInfo()
-  // // 获取菜单数据
-  // await useMenuStore().getMenuInfo()
-  // router.push('/admin')
-  // return ElMessage.success(res.msg)
 }
 
 const onChangeCaptCha = () => {
@@ -85,9 +79,9 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   })
 }
 
+// 重置
 const resetForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return
-
   formEl.resetFields()
 }
 
@@ -99,6 +93,33 @@ defineExpose({
   ruleForm,
   ruleFormRef,
   resetForm
+})
+
+const isRemember = ref<boolean>(true)
+
+const onRemeber = () => {
+  localStorage.setItem('isRemember', String(isRemember.value))
+
+  // rememberPwd.value = !rememberPwd.value
+  // const rememberPassWord = localStorage.getItem('reme_tut')
+  // const setRememberPassWord = (account:) => {
+  //   localStorage.setItem('reme_tut', JSON.parse())
+  // }
+}
+
+onBeforeMount(() => {
+  isRemember.value = localStorage.getItem('isRemember') == 'true'
+
+  if (isRemember.value) {
+    const localAccount = localStorage.getItem('reme_tut')
+    const account = localAccount ? JSON.parse(localAccount) : ''
+
+    if (account) {
+      ruleForm.username = Decrypt(account.username)
+      ruleForm.password = Decrypt(account.password)
+    }
+  }
+  // ruleForm
 })
 </script>
 <template>
@@ -144,7 +165,11 @@ defineExpose({
       </el-form-item>
 
       <div class="flex justify-between my-3 -mt-3">
-        <el-checkbox :label="$t('login.rememberPw')"></el-checkbox>
+        <el-checkbox
+          v-model="isRemember"
+          :label="$t('login.rememberPw')"
+          @change="onRemeber"
+        ></el-checkbox>
         <el-link type="primary" :underline="false" href="" target="_blank"
           >{{ $t('login.forgetPassword') }}?</el-link
         >
