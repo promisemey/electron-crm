@@ -81,7 +81,7 @@ const onJump = (path: string) => {
 }
 </script>
 <template>
-  <div class="h-15 w-full overflow-hidden">
+  <div class="h-10 w-full overflow-hidden">
     <el-tabs
       v-model="editableTabsValue"
       type="border-card"
@@ -89,8 +89,6 @@ const onJump = (path: string) => {
       @tab-change="onJump"
       @tab-remove="removeTab"
     >
-      <el-button type="primary" size="default" @click="addTab"></el-button>
-
       <el-tab-pane
         v-for="item in editableTabs"
         :key="item.path"
@@ -98,7 +96,7 @@ const onJump = (path: string) => {
         :label="item.title"
         :name="JSON.stringify(item)"
       >
-        {{ item }}
+        <!-- {{ item }} -->
       </el-tab-pane>
     </el-tabs>
   </div>
