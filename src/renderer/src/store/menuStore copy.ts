@@ -3,17 +3,17 @@ import { defineStore, storeToRefs } from 'pinia'
 import { useUserStore } from './userStore'
 import { reactive, ref } from 'vue'
 import { Children, Menu } from '@api/common/types'
-import { ComponentViews, MenuStore, MetaType, ResetMenu, RoutesItem } from '@types'
+import { ComponentViews, ResetMenu, RoutesItem } from '@types'
 import router from '@router'
 // import { RouteRecordRaw } from 'vue-router'
 
 export const useMenuStore = defineStore('menuStore', () => {
-  const localMenu = localStorage.getItem('menu_info')
+  const localMenu = localStorage.getItem('menu')
 
-  const menu_info = reactive<MenuStore[]>(localMenu ? JSON.parse(localMenu) : [])
+  const menuInfo = reactive<Menu[]>(localMenu ? JSON.parse(localMenu) : [])
 
   // 二级菜单
-  const childMenu = reactive<RoutesItem[]>([])
+  const childMenu = reactive<Children[]>([])
   const defaultActive = ref('/home')
   // 二级菜单  默认选中该
   const childDefaultActive = ref<string>('')
@@ -34,22 +34,26 @@ export const useMenuStore = defineStore('menuStore', () => {
   }
 
   // 映射路由数据
-  const addRouteDy = <T extends ResetMenu>(
-    menu: T[],
+  const addRouteDy = (
+    menu: ResetMenu[],
     routes: RoutesItem[] = [],
-    parent?: Record<string, any>
+    path?: string
   ): RoutesItem[] => {
-    // 原始菜单
     if (menu.length == 0 || routes == undefined) return []
 
     menu.forEach((item): void => {
-      const routesItem: RoutesItem = {
-        id: item.id,
-        path: `/${item.path}`.replace('//', '/'),
-        name: item.name,
+      const routesItem: RoutesItem | Menu = {
+        // path: item.path.replace(path, '/').replace('//', ''),
+        path: path
+          ? `${path + item.path.replace('/channel-', '')}`
+              .replace('//', '/')
+              .replaceAll(`${path}${path}`.replace('//', '/'), path)
+              .replace('/home/dashboard', '/dashboard')
+          : item.path,
+        name: item.path,
         redirect: item.redirect,
         parentView: item.parentView,
-        meta: Object.assign(item.meta, parent),
+        meta: item.meta,
         children: item.children ?? [],
         component: item.component ?? null
       }
@@ -61,12 +65,7 @@ export const useMenuStore = defineStore('menuStore', () => {
       }
       routes.push(routesItem)
 
-      // 子菜单 有数据
-      if (item.children != null && item.children?.length)
-        addRouteDy(item.children, routesItem.children, {
-          breadCrumbs: { ...item.meta },
-          parent: item.path
-        })
+      if (item.children != null) addRouteDy(item.children, routesItem.children, item.path + '/')
     })
 
     return routes
@@ -75,45 +74,38 @@ export const useMenuStore = defineStore('menuStore', () => {
   // 获取路由信息
   const getMenuInfo = async () => {
     // 本地无数据
-    if (!dyRoutes.length) {
+    if (!menuInfo.length) {
       const res = useUserStore()
       const { rolePerm } = storeToRefs(res)
 
-      const menuInfo = await getMenuInfoApi(rolePerm.value)
-      if (menuInfo.code == 200) {
-        localStorage.setItem('menu_info', JSON.stringify(menuInfo.data))
-        setDyRoutes(menuInfo.data)
+      const menu = await getMenuInfoApi(rolePerm.value)
+      if (menu.code == 200) {
+        Object.assign(menuInfo, menu.data)
+        localStorage.setItem('menu', JSON.stringify(menu.data))
       }
-    } else {
-      setDyRoutes(menu_info)
     }
-  }
 
-  // 添加route
-  const setDyRoutes = (menuData) => {
-    const mapRoutes = addRouteDy(menuData)
-    Object.assign(dyRoutes, mapRoutes)
+    const mapRoutes = addRouteDy(menuInfo)
+
     localStorage.setItem('mapRoutes', JSON.stringify(mapRoutes))
 
-    const setRoutes = (routeMenu) => {
-      routeMenu.forEach((item) => {
-        router.addRoute(item.parentView ?? 'layout', item)
-        if (item.children?.length) setRoutes(item.children)
-      })
-    }
+    Object.assign(dyRoutes, mapRoutes)
 
-    setRoutes(mapRoutes)
+    // for (let i = 0; i < dyRoutes.length; i++) {
+    dyRoutes.forEach((item) => router.addRoute(item.parentView ?? 'layout', item))
+    // }
   }
 
   // dyRoutes.forEach((item) => router.addRoute(item.parentView ?? item.name, item))
 
   return {
-    dyRoutes,
+    menuInfo,
     childMenu,
     defaultActive,
     childDefaultActive,
     isCollapse,
     currentMenu,
+
     getMenuInfo
   }
 })

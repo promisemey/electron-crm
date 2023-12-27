@@ -8,7 +8,14 @@ const router = createRouter({
       path: '/',
       name: 'layout',
       redirect: '/dashboard',
-      component: () => import('@renderer/layout/index.vue')
+      component: () => import('@renderer/layout/index.vue'),
+      children: [
+        {
+          name: '404',
+          path: '/:catchAll(.*)',
+          component: () => import(`@renderer/views/404.vue`)
+        }
+      ]
     },
     {
       path: '/login',

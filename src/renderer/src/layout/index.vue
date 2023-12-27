@@ -1,15 +1,20 @@
 <script lang="ts" setup>
 import MoveWindows from '@components/MoveWindows.vue'
-import { onBeforeMount, ref } from 'vue'
+import { ref } from 'vue'
 import PrimaryMenu from './components/menu/PrimaryMenu.vue'
 import MenuItem from './components/menu/MenuItem.vue'
 import Logo from '@components/Logo.vue'
 import BreadCrums from './components/navbar/BreadCrums.vue'
 import Tools from './components/navbar/Tools.vue'
 import TagsMenu from './components/navbar/TagsMenu.vue'
+import { onMounted } from 'vue'
 // 调整窗口大小
-onBeforeMount(() => {
-  // window.electron.ipcRenderer.invoke('resize-frame')
+onMounted(() => {
+  try {
+    window.electron.ipcRenderer.invoke('resize-frame')
+  } catch (error) {
+    /* empty */
+  }
 })
 
 const tagMenuRef = ref()

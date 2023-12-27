@@ -6,11 +6,15 @@ import { reactive, ref } from 'vue'
 // 第一个参数是你的应用中 Store 的唯一 ID。
 export const useUserStore = defineStore('userStore', () => {
   // 用户信息
-  const userInfo = reactive<Partial<UserInfo>>({})
+  const localUser = localStorage.getItem('userInfo')
+  const localRole = localStorage.getItem('role')
+  const localRolePerm = localStorage.getItem('rolePerm')
+
+  const userInfo = reactive<Partial<UserInfo>>(localUser ? JSON.parse(localUser) : {})
   // 角色
-  const role = reactive<Role[]>([])
+  const role = reactive<Role[]>(localRole ? JSON.parse(localRole) : [])
   // 角色权限
-  const rolePerm = ref('')
+  const rolePerm = ref(localRolePerm ?? '')
 
   const getUserInfo = async () => {
     const res = await getUserInfoApi()

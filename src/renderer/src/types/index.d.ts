@@ -5,16 +5,24 @@ type OmitMenuMoreType = Omit<OmitMenuType, 'query' | 'id' | 'hidden' | 'alwaysSh
 
 type ComponentViews = Component | undefined
 
-type MetaType = Record<string | number | symbol, unknown>
+type MetaType = Record<string | number | symbol, unknown> & Meta
+
+interface MenuStore extends Omit<Menu, 'meta'> {
+  meta: MetaType
+  children?: RoutesItem[]
+}
 
 interface ResetMenu extends OmitMenuType {
   meta: MetaType
-  children: ResetChild[]
+  children?: RoutesItem[]
 }
 
-interface ResetChild extends ResetMenu {}
+// 添加面包屑
+// interface ResetChild extends ResetMenu {
+//   breadCrumbs: Meta[]
+// }
 
-interface RoutesItem extends OmitMenuMoreType {
+interface RoutesItem extends OmitMenuType {
   children?: ChildItem[]
   meta: MetaType
 }
@@ -23,13 +31,9 @@ interface RoutesItem extends OmitMenuMoreType {
 
 interface ChildItem extends RoutesItem {}
 
-interface extensionMeta extends RouteLocationNormalizedLoaded {
-  meta: Meta
-}
-
 // 标签页
 interface TabsType {
   title: string
-  name: string
   path: string
+  index: string
 }

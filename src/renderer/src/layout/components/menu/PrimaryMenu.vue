@@ -3,7 +3,8 @@ import { onBeforeMount } from 'vue'
 import { useMenuStore } from '@store/menuStore'
 import { useRoute } from 'vue-router'
 import { useSelectMenu } from '@hooks/useSelectMenu'
-// const router = useRouter()
+import { Meta } from '@api/common/types'
+
 // 菜单数据
 const menuStore = useMenuStore()
 const route = useRoute()
@@ -39,23 +40,27 @@ const onClickMenu = (active) => {
 // }
 
 onBeforeMount(() => {
-  const res = route.fullPath.split('/')[1].replace('', '/')
-  menuStore.defaultActive = res
+  // const res = route.fullPath.split('/')[1].replace('', '/')
+
+  const parentMenu: string = route.meta.parent as string
+
+  menuStore.defaultActive = parentMenu
 
   // 解决 仪表盘页面刷新 一级选中丢失问题
   if (route.fullPath == '/dashboard') menuStore.defaultActive = '/home'
 
   // 二级菜单 初始数据
-  menuStore.childMenu = route.matched[1].children as any
+  const parent = menuStore.dyRoutes.find((item) => item.path === parentMenu)
 
-  // 解决  渠道（账号 管理） 刷新都选中问题
-  // let title: null | string = null
-  // if (res[1] && res[1] === '/channel') title = localStorage.getItem('title')
+  if (parent?.children) {
+    menuStore.childMenu = parent?.children
+  }
 
   // 二级默认选中
-  menuStore.childDefaultActive = route.fullPath + route.meta.title
+  menuStore.childDefaultActive = route.fullPath
+
   // 一级菜单 标题
-  menuStore.currentMenu = route.matched[1].meta.title
+  menuStore.currentMenu = (route.meta.breadCrumbs as Meta).title
 })
 </script>
 <template>
@@ -66,14 +71,14 @@ onBeforeMount(() => {
       :collapse="menuStore.isCollapse"
       router
     >
-      <template v-for="menu in menuStore.menuInfo" :key="menu.id">
+      <template v-for="menu in menuStore.dyRoutes" :key="menu.id">
         <el-menu-item v-if="menu.meta.title !== '小鹿线'" :index="menu.path" @click="onClickMenu">
           <el-icon class="m-0">
             <component :is="menu.meta.icon.replace('el-icon-', '')"></component>
           </el-icon>
           <template #title>
             <span class="bg-pink">
-              {{ menu.name }}
+              {{ menu.meta.title }}
             </span>
           </template>
         </el-menu-item>

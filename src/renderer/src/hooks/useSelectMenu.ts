@@ -4,38 +4,56 @@ import router from '@router'
 // 菜单数据
 const menuStore = useMenuStore()
 
-interface Active {
-  index: string
+interface MenuItem {
+  path?: string
+  title?: string
+}
+interface MenuValType extends MenuItem {
+  index?: string
 }
 
 // 查找二级菜单
-export const useSelectMenu = (active: Active) => {
-  // if (route.path.includes(active.index)) return
-  // 更新二级数据
+enum Level {
+  PRIMARY,
+  MenuItem
+}
 
-  console.log(active)
+export const useSelectMenu = (active: MenuValType, level?: Level) => {
+  if (!level && active.index) {
+    // 更新二级数据
+    const menuItem = menuStore.dyRoutes.find((item) => item.path == active.index)
 
-  const menuItem = menuStore.menuInfo.find((item) => item.path == active.index)
+    const childData = menuItem?.children
 
-  console.log(menuItem)
+    if (childData?.length) {
+      menuStore.childMenu = childData
+      Object.assign(childData.values, childData)
+      menuStore.defaultActive = active.index
 
-  const childData = menuItem?.children
+      if (!active.path || !active.title) {
+        active.path = childData[0].path
+        active.title = childData[0].meta.title
+      }
 
-  if (childData?.length) {
-    menuStore.childMenu = childData
-    Object.assign(childData.values, childData)
-    menuStore.defaultActive = active.index
+      console.log(menuItem, '-----')
 
-    menuStore.childDefaultActive = childData[0].path + childData[0].meta.title
-    menuStore.currentMenu = menuItem?.meta.title
+      menuStore.currentMenu = menuItem?.name
 
-    // 跳转二级首项
-    let routePath = childData[0].path
+      // 跳转二级首项
+      // let routePath = childData[0].path
+      // if (active.index === '/logger') routePath = active.index + routePath
+      // // router.push(routePath)
+    }
+  }
 
-    if (active.index === '/logger') routePath = active.index + routePath
+  useChangeMenuItem({ path: active.path, title: active.title })
+}
 
-    console.log(routePath)
+const useChangeMenuItem = ({ path, title }: MenuItem) => {
+  // console.log('path, title', path, title)
 
-    router.push(routePath)
+  if (path && title) {
+    menuStore.childDefaultActive = path
+    router.push(path)
   }
 }

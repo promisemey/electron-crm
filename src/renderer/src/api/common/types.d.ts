@@ -117,6 +117,7 @@ interface Meta {
   link: null | string //外链
   affix: false
   hidden: true
+  breadCrumbs?: Meta
 }
 
 interface Children extends Menu {}
@@ -124,11 +125,11 @@ interface Children extends Menu {}
 interface Menu {
   id: string //ID
   name: string //路由名称
-  hidden: boolean //显示状态
+  hidden?: boolean //显示状态
   redirect: string //重写向地址
   component: any //组件路径
-  alwaysShow: boolean //是否总显示
-  query: string //路由参数
+  alwaysShow?: boolean //是否总显示
+  query?: string //路由参数
   path: string //路由地址
   meta: Meta
   parentView: string

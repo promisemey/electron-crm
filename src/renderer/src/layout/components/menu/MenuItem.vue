@@ -1,22 +1,13 @@
 <script lang="ts" setup>
-import { useChangeMenuItem } from '@hooks/useChangeMenuItem'
+import { useSelectMenu } from '@hooks/useSelectMenu'
 import { useMenuStore } from '@store/menuStore'
 
 // 菜单数据
 const menuStore = useMenuStore()
 
 const onChangeRoutes = (path: string, title: string) => {
-  useChangeMenuItem({ path, title })
+  useSelectMenu({ path, title }, 1)
 }
-
-// const onChangeRoutes = (path: string, title: string) => {
-//   menuStore.childDefaultActive = path + title
-//   // if(path.includes('channel-'))
-
-//   if (path.includes('channel-')) path = path.replace('/channel-', '')
-
-//   router.push(path.replace('/log/', '/logger/log/'))
-// }
 </script>
 <template>
   <div class="menu-item h-full">
@@ -35,10 +26,7 @@ const onChangeRoutes = (path: string, title: string) => {
           >
             <!-- <template v-for="item in childMenu" :key="`${defaultActive}-${item.id}`"> -->
             <template v-for="item in menuStore.childMenu" :key="item.id">
-              <el-menu-item
-                :index="item.path + item.meta.title"
-                @click="onChangeRoutes(item.path, item.meta.title)"
-              >
+              <el-menu-item :index="item.path" @click="onChangeRoutes(item.path, item.meta.title)">
                 <el-icon>
                   <component :is="item.meta.icon.replace('el-icon-', '') || 'user'"></component>
                 </el-icon>
