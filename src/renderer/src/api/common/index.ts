@@ -1,4 +1,5 @@
-import request from '@renderer/utils/request'
+import request from '@utils/request'
+
 import {
   GetCaptchaPayloadType,
   GetCaptchaResType,

@@ -69,11 +69,14 @@ console.log(tagMenuRef)
         <!-- main -->
 
         <main class="flex-1 h-full overflow-hidden m-4 drop-shadow-lg">
-          <el-card shadow="always" class="h-full" body-class="h-full">
-            <el-scrollbar>
-              <router-view />
-              <div v-for="item in 100" :key="item">{{ item }}</div>
-            </el-scrollbar>
+          <el-card
+            shadow="always"
+            class="h-full overflow-hidden"
+            body-class="h-full overflow-hidden"
+          >
+            <!-- <el-scrollbar> -->
+            <router-view />
+            <!-- </el-scrollbar> -->
           </el-card>
         </main>
 

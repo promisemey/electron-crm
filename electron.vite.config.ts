@@ -21,7 +21,8 @@ export default defineConfig({
         '@api': resolve('src/renderer/src/api'),
         '@store': resolve('src/renderer/src/store'),
         '@hooks': resolve('src/renderer/src/hooks'),
-        '@router': resolve('src/renderer/src/router')
+        '@router': resolve('src/renderer/src/router'),
+        '@utils': resolve('src/renderer/src/utils')
       }
     },
     plugins: [

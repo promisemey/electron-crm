@@ -2,8 +2,7 @@ import { getMenuInfoApi } from '@api/common'
 import { defineStore, storeToRefs } from 'pinia'
 import { useUserStore } from './userStore'
 import { reactive, ref } from 'vue'
-import { Children, Menu } from '@api/common/types'
-import { ComponentViews, MenuStore, MetaType, ResetMenu, RoutesItem } from '@types'
+import { ComponentViews, MenuStore, ResetMenu, RoutesItem } from '@types'
 import router from '@router'
 // import { RouteRecordRaw } from 'vue-router'
 
@@ -37,7 +36,7 @@ export const useMenuStore = defineStore('menuStore', () => {
   const addRouteDy = <T extends ResetMenu>(
     menu: T[],
     routes: RoutesItem[] = [],
-    parent?: Record<string, any>
+    parent?: Record<string, unknown>
   ): RoutesItem[] => {
     // 原始菜单
     if (menu.length == 0 || routes == undefined) return []

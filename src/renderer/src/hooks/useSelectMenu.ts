@@ -35,7 +35,7 @@ export const useSelectMenu = (active: MenuValType, level?: Level) => {
         active.title = childData[0].meta.title
       }
 
-      console.log(menuItem, '-----')
+      // console.log(menuItem, '-----')
 
       menuStore.currentMenu = menuItem?.name
 
