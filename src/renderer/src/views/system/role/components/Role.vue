@@ -1,12 +1,13 @@
 <script lang="ts" setup>
 import { onBeforeMount } from 'vue'
 // 获取角色列表
-import { getRole } from '@api/role'
+import { getRoleApi } from '@api/role'
 import { RoleType } from '@api/role/types'
 import { ref } from 'vue'
 import { TableColumnCtx } from 'element-plus'
 import type { DICTIONARY } from '@api/dictionary/types'
 import { reactive } from 'vue'
+import { PageDataType } from '@api/types'
 
 // table数据
 const tableData = ref<RoleType[]>([])
@@ -20,6 +21,19 @@ const formatter = (_row: RoleType, _column: TableColumnCtx<RoleType>, timeNum: D
   return `${timestamp.toLocaleDateString()} ${timestamp.toLocaleTimeString()}`
 }
 
+// 分页
+const pagination = reactive<Partial<PageDataType>>({})
+
+const onSizeChange = (pagesize: number) => {
+  formData.size = pagesize
+  getRoleData()
+}
+const onCurrentChange = (current: number) => {
+  formData.current = current
+  getRoleData()
+}
+
+// 筛选
 interface FormData {
   current: number | string
   size: number | string
@@ -28,25 +42,12 @@ interface FormData {
   enabled?: number | string
 }
 
-// 筛选
 const formData = reactive<FormData>({
   current: 1,
-  size: 20,
+  size: 10,
   roleName: '',
   rolePerm: '',
   enabled: ''
-})
-
-const getRoleData = async () => {
-  const res = await getRole(formData)
-
-  if (res.code == '200') {
-    tableData.value = res.data.records
-  }
-}
-
-onBeforeMount(() => {
-  getRoleData()
 })
 
 // 搜索
@@ -59,16 +60,27 @@ const onReset = () => {
   getRoleData()
 }
 
+// 获取角色列表
+const getRoleData = async () => {
+  const res = await getRoleApi(formData)
+
+  if (res.code == '200') {
+    const { records, ...other } = res.data
+    tableData.value = records
+    Object.assign(pagination, other)
+  }
+}
+
+onBeforeMount(() => {
+  getRoleData()
+})
+
 // table
 const handleEdit = () => {
   console.log('click')
 }
 
 defineProps<{ roleStatus: DICTIONARY[] }>()
-
-// defineExpose({
-//   options
-// })
 </script>
 <template>
   <div class="role h-full flex flex-col">
@@ -99,7 +111,8 @@ defineProps<{ roleStatus: DICTIONARY[] }>()
     <!-- 筛选 -->
 
     <!-- table -->
-    <el-card shadow="always" class="flex-1">
+
+    <el-card shadow="always" class="flex-1" body-class="flex flex-col">
       <el-table
         :data="tableData"
         class="flex-1 !h-full"
@@ -126,11 +139,24 @@ defineProps<{ roleStatus: DICTIONARY[] }>()
 
         <el-table-column fixed="right" label="操作" width="200">
           <template #default>
-            <el-button link type="primary" size="small" @click="handleEdit">Detail</el-button>
+            <el-button link type="primary" size="small" @click="handleEdit">编辑</el-button>
+            <el-button link type="primary" size="small" @click="handleEdit"></el-button>
             <el-button link type="primary" size="small">Edit</el-button>
           </template>
         </el-table-column>
       </el-table>
+
+      <!-- 分页 -->
+
+      <Pagination
+        :current="formData.current"
+        :size="formData.size"
+        :count="pagination.pages"
+        @size-change="onSizeChange"
+        @current-change="onCurrentChange"
+      ></Pagination>
+
+      <!-- 分页  -->
     </el-card>
 
     <!-- table -->

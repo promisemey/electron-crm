@@ -13,10 +13,15 @@ import './permission'
 //国际化
 import i18n from './locales/index'
 
+import Pagination from '@components/Pagination.vue'
+
 const app = createApp(App)
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)
 }
+
+// 公共组件
+app.component('Pagination', Pagination)
 
 // 状态管理
 app.use(createPinia())

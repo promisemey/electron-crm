@@ -1,4 +1,4 @@
-import { ResType } from '@api/types'
+import { PageDataType, ResType } from '@api/types'
 
 // 角色列表
 export interface GetRolePayloadyType {
@@ -23,17 +23,10 @@ export interface RoleType {
   descript?: null //描述
 }
 
+interface RolePageType extends PageDataType {
+  records: RoleType[]
+}
+
 export interface GetRoleResType extends ResType {
-  data: {
-    records: RoleType[]
-    total: number | string
-    size: number | string
-    current: number | string
-    orders: Array
-    optimizeCountSql: boolean
-    searchCount: boolean
-    countId?: unknown
-    maxLimit?: unknown
-    pages: number | string
-  }
+  data: RolePageType
 }

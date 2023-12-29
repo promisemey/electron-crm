@@ -9,7 +9,7 @@ import { useDictStore } from '@store/dictStore'
 import { reactive } from 'vue'
 import { DICTIONARY } from '@api/dictionary/types'
 
-// import { getDictPage } from '@api/dictionary'
+// import { getDictPageApiApi } from '@api/dictionary'
 
 // 面板默认选中
 const activeName = ref('role')
@@ -40,7 +40,7 @@ const { postDict } = useDictStore()
 const roleStatus = reactive<DICTIONARY[]>([])
 onBeforeMount(async () => {
   const dist = await postDict<['system_global_status']>(['system_global_status'])
-  // const a = await getDictPage({ current: 1, size: 1000 })
+  // const a = await getDictPageApi({ current: 1, size: 1000 })
   Object.assign(roleStatus, dist.data.system_global_status)
   // console.log(roleOrRecycle.value)
 })
