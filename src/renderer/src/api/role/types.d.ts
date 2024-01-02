@@ -10,6 +10,7 @@ export interface GetRolePayloadyType {
 }
 
 export interface RoleType {
+  checked?: boolean | string | number
   id: number | string //角色ID
   roleName: string //角色名称
   rolePerm: number | string //角色权限字符
