@@ -1,13 +1,19 @@
 <script lang="ts" setup>
 import { onBeforeMount } from 'vue'
 // 获取角色列表
-import { getRoleApi } from '@api/role'
+import { getDelRoleApi, getRoleApi } from '@api/role'
 import { RoleType } from '@api/role/types'
 import { ref } from 'vue'
 import { TableColumnCtx } from 'element-plus'
-import type { DICTIONARY } from '@api/dictionary/types'
+import type { Dictionary } from '@api/dictionary/types'
 import { reactive } from 'vue'
 import { PageDataType } from '@api/types'
+import { useConfirm } from '@hooks/useConfirm'
+import CreateRole from './CreateRole.vue'
+import { useStore } from '@store'
+import { storeToRefs } from 'pinia'
+const mainStore = useStore()
+const { roleVisit } = storeToRefs(mainStore)
 
 // table数据
 const tableData = ref<RoleType[]>([])
@@ -47,7 +53,7 @@ const formData = reactive<FormData>({
   size: 10,
   roleName: '',
   rolePerm: '',
-  enabled: ''
+  enabled: '1'
 })
 
 // 搜索
@@ -75,18 +81,38 @@ onBeforeMount(() => {
   getRoleData()
 })
 
+// const id = ref<string>()
 // table
-const handleEdit = () => {
-  console.log('click')
+const handleEdit = (row: RoleType) => {
+  roleVisit.value = true
+  createRoleRef.value.formData.id = row.id as string
+  createRoleRef.value.getDetail(row.id)
+}
+const handleDel = async (id: number) => {
+  useConfirm(id, getDelRoleApi, getRoleData)
+  // const res = await getDelRoleApi(id)
 }
 
-defineProps<{ roleStatus: DICTIONARY[] }>()
+// 创建角色
+const createRoleRef = ref()
+
+defineProps<{ roleStatus: Dictionary[] }>()
+
+defineExpose({
+  getRoleData
+})
 </script>
 <template>
   <div class="role h-full flex flex-col">
     <!-- 筛选 -->
-    <el-card shadow="always" class="mb-5 flex items-center">
-      <el-form ref="form" :model="formData" :inline="true" label-width="80" class="-mb-5">
+    <el-card shadow="always" class="mb-5 flex items-center" body-class="w-full">
+      <el-form
+        ref="form"
+        :model="formData"
+        :inline="true"
+        label-width="80"
+        class="-mb-5 flex flex-wrap"
+      >
         <el-form-item label="角色名称">
           <el-input v-model="formData.roleName" placeholder="请输入角色名称"></el-input>
         </el-form-item>
@@ -107,11 +133,9 @@ defineProps<{ roleStatus: DICTIONARY[] }>()
         </el-row>
       </el-form>
     </el-card>
-
     <!-- 筛选 -->
 
     <!-- table -->
-
     <el-card shadow="always" class="flex-1" body-class="flex flex-col">
       <el-table
         :data="tableData"
@@ -138,8 +162,9 @@ defineProps<{ roleStatus: DICTIONARY[] }>()
         />
 
         <el-table-column fixed="right" label="操作" width="200">
-          <template #default>
-            <el-button link type="primary" size="small" @click="handleEdit">编辑</el-button>
+          <template #default="{ row }">
+            <el-button link type="primary" size="small" @click="handleEdit(row)">编辑</el-button>
+            <el-button link type="primary" size="small" @click="handleDel(row.id)">删除</el-button>
             <el-button link type="primary" size="small" @click="handleEdit"></el-button>
             <el-button link type="primary" size="small">Edit</el-button>
           </template>
@@ -158,9 +183,30 @@ defineProps<{ roleStatus: DICTIONARY[] }>()
 
       <!-- 分页  -->
     </el-card>
-
     <!-- table -->
+
+    <!-- 编辑/创建 -->
+    <Teleport to="#app">
+      <CreateRole ref="createRoleRef" :refresh="getRoleData" :role-status="roleStatus" />
+    </Teleport>
+    <!-- 编辑/创建 -->
   </div>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.el-form-item {
+  flex-grow: 1;
+
+  .el-form-item__content {
+    min-width: 200px;
+  }
+
+  .el-select {
+    width: 100%;
+  }
+}
+
+:deep(.el-row) {
+  width: 100%;
+}
+</style>

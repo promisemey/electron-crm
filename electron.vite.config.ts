@@ -36,6 +36,7 @@ export default defineConfig({
       })
     ],
     server: {
+      port: 5000,
       proxy: {
         '/api': {
           target: 'http://uat.crm.xuexiluxian.cn',
@@ -44,7 +45,13 @@ export default defineConfig({
         }
       }
     }
+    // esbuild: {
+    //   jsxFactory: 'h',
+    //   jsxFragment: 'Fragment',
+    //   jsxInject: `import React from 'react'`
+    // }
   }
+
   // pluginOptions: {
   //   electronBuilder: {
   //     nodeIntegration: true

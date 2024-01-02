@@ -7,7 +7,6 @@ import {
 } from './types'
 
 // 查询字典列表
-
 export const getDictPageApi = (params: GetDictPagePayloadType) => {
   return request.get<GetDictPageResType>('/system/dict/item/page', params)
 }

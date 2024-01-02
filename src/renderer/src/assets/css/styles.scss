@@ -7,6 +7,27 @@
 // );
 @use 'node_modules/element-plus/theme-chalk/src/dark/css-vars.scss';
 
+/* 全局滚动条样式 */
+.scrollable {
+  -webkit-overflow-scrolling: touch;
+}
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgba(50, 50, 50, 0.3);
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(50, 50, 50, 0.6);
+}
+::-webkit-scrollbar-track {
+  background-color: rgba(50, 50, 50, 0.1);
+}
+::-webkit-scrollbar-track:hover {
+  background-color: rgba(50, 50, 50, 0.2);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -25,4 +46,14 @@ html,
 body {
   height: 100vh;
   // background-color: pink;
+}
+
+.el-dialog__header {
+  height: 30px !important;
+}
+
+.el-dialog .el-dialog__body {
+  /* height: 200px !important; */
+  flex: 1;
+  overflow: hidden;
 }

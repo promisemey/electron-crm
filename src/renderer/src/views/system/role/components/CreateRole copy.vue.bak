@@ -1,0 +1,167 @@
+<script lang="ts" setup>
+import { getRoleTreeApi } from '@api/role'
+import { RoleTreeType } from '@api/role/types'
+import { Form } from '@components/PrForm/types'
+import { ElTree } from 'element-plus'
+import { onMounted } from 'vue'
+import { Ref, ref } from 'vue'
+
+const createRoleVisible = ref(false)
+
+const tree = ref<RoleTreeType[]>([])
+const propsTree = {
+  label: 'name'
+}
+
+// const formItem: Form.Item[] = [
+//   // ...
+//   {
+//     field: 'rolename',
+//     label: '角色名称',
+//     type: 'text',
+//     placeholder: '请输入角色名称',
+//     icon: 'el-icon-user-solid',
+//     disabled: false
+//   },
+//   {
+//     field: 'rolePrm',
+//     label: '权限字符',
+//     type: 'text',
+//     placeholder: '请输入权限字符',
+//     icon: 'el-icon-user-solid',
+//     disabled: false
+//   },
+//   {
+//     field: 'status',
+//     label: '状态',
+//     type: 'radio',
+//     options: [
+//       {
+//         label: '启用',
+//         value: 0
+//       },
+//       {
+//         label: '禁用',
+//         value: 1
+//       }
+//     ],
+//     disabled: false
+//   },
+//   {
+//     field: 'menu_status',
+//     label: '菜单权限',
+//     type: 'checkbox',
+//     options: [
+//       {
+//         label: '展开',
+//         value: 0
+//       },
+//       {
+//         label: '权限',
+//         value: 1
+//       },
+//       {
+//         label: '父子(联动/不联动)',
+//         value: 2
+//       }
+//     ],
+//     disabled: false
+//   },
+//   {
+//     field: 'remark',
+//     label: '备注',
+//     type: 'textarea',
+//     textarea: {
+//       maxlength: 200,
+//       resize: 'none',
+//       row: 5
+//     },
+//     disabled: false
+//   }
+//   // ...
+// ]
+
+// const formBtn: Form.Btn[] = [
+//   {
+//     content: '取消',
+//     click: (formData) => console.log('表单数据', formData),
+//     custom: false
+//   },
+//   {
+//     content: '创建',
+//     type: 'primary',
+//     custom: false
+//   }
+// ]
+
+onMounted(async () => {
+  const res = await getRoleTreeApi()
+  tree.value = res.data
+})
+
+defineExpose<{
+  createRoleVisible: Ref<boolean>
+}>({
+  createRoleVisible
+})
+</script>
+
+<template>
+  <el-dialog
+    v-model="createRoleVisible"
+    width="50%"
+    class="h-[70%] overflow-hidden flex flex-col"
+    center
+  >
+    <el-scrollbar class="h-full">
+      <el-form
+        ref="form"
+        :model="form"
+        :rules="rules"
+        label-width="80px"
+        :inline="false"
+        size="normal"
+      >
+        <el-form-item label="角色名称">
+          <el-input v-model="form."></el-input>
+        </el-form-item>
+        <el-form-item label="权限字符">
+          <el-input v-model="form."></el-input>
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-input v-model="form."></el-input>
+        </el-form-item>
+        <el-form-item label="菜单权限">
+          <el-input v-model="form."></el-input>
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input v-model="form."></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="onSubmit">立即创建</el-button>
+          <el-button>取消</el-button>
+        </el-form-item>
+      </el-form>
+
+      <!-- <PrFome ref="prFomeRef" :label-width="80" :form-item="formItem" :form-btn="formBtn">
+        <template #tree>
+          <div class="w-[90%] h-[200px] rounded-sm border">
+            <el-scrollbar>
+              <el-tree
+                ref="treeRef"
+                :props="propsTree"
+                :data="tree"
+                show-checkbox
+                node-key="id"
+                highlight-current
+                :default-expand-all="treeExpand"
+              />
+            </el-scrollbar>
+          </div>
+        </template>
+      </PrFome> -->
+    </el-scrollbar>
+  </el-dialog>
+</template>
+
+<style lang="scss"></style>

@@ -1,7 +1,7 @@
 import { ResType } from '@api/types'
 import { keysOf } from 'element-plus/es/utils'
 
-type DICTIONARY = {
+type Dictionary = {
   id: string | number //字典ID
   typeId: string | number //字典类型ID
   k: string //键
@@ -25,7 +25,7 @@ export interface GetDictPagePayloadType {
 
 export interface GetDictPageResType extends ResType {
   data: {
-    records: DICTIONARY[]
+    records: Dictionary[]
     total: number
     size: number
     current: number
@@ -43,6 +43,6 @@ export type PostDictPayloayType = string[]
 
 export interface PostDictResType<T> extends ResType {
   data: {
-    [k in T[number]]: DICTIONARY[]
+    [k in T[number]]: Dictionary[]
   }
 }

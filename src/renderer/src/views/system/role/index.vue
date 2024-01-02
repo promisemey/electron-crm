@@ -1,16 +1,18 @@
 <script lang="ts" setup>
 import Role from './components/Role.vue'
 import Recycle from './components/Recycle.vue'
+import { onBeforeMount } from 'vue'
 
 import { ref } from 'vue'
-import type { TabsPaneContext } from 'element-plus'
-import { onBeforeMount } from 'vue'
+// import type { TabsPaneContext } from 'element-plus'
 import { useDictStore } from '@store/dictStore'
 import { reactive } from 'vue'
-import { DICTIONARY } from '@api/dictionary/types'
-
-// import { getDictPageApiApi } from '@api/dictionary'
-
+import { Dictionary } from '@api/dictionary/types'
+import { useStore } from '@store'
+import { storeToRefs } from 'pinia'
+// import CreateRole from './components/CreateRole.vue'
+const mainStore = useStore()
+const { roleVisit } = storeToRefs(mainStore)
 // 面板默认选中
 const activeName = ref('role')
 
@@ -29,25 +31,40 @@ const editableTabs = [
 ]
 
 // tabs
-const handleClick = (tab: TabsPaneContext, event: Event) => {
-  console.log(tab, event)
-}
+// const handleClick = (tab: TabsPaneContext, event: Event) => {
+//   console.log(tab, event)
+// }
 
 const roleOrRecycle = ref()
 
 const { postDict } = useDictStore()
 
-const roleStatus = reactive<DICTIONARY[]>([])
+const roleStatus = reactive<Dictionary[]>([])
+
+// const refresh = () => {
+//   roleOrRecycle.value[0].getRoleData()
+// }
+
 onBeforeMount(async () => {
   const dist = await postDict<['system_global_status']>(['system_global_status'])
-  // const a = await getDictPageApi({ current: 1, size: 1000 })
-  Object.assign(roleStatus, dist.data.system_global_status)
-  // console.log(roleOrRecycle.value)
+
+  console.log(dist, '----')
+
+  Object.assign(roleStatus, dist.system_global_status)
 })
+
+// 创建角色
+// const createRoleRef = ref()
+const handleCreateRole = () => {
+  console.log(roleOrRecycle.value[0])
+  roleVisit.value = true
+
+  // createRoleRef.value.createRoleVisible = true
+}
 </script>
 <template>
   <div class="role h-full overflow-hidden">
-    <el-tabs v-model="activeName" class="h-full flex flex-col" @tab-click="handleClick">
+    <el-tabs v-model="activeName" class="h-full flex flex-col !border-none">
       <el-tab-pane
         v-for="item in editableTabs"
         :key="item.name"
@@ -57,34 +74,62 @@ onBeforeMount(async () => {
       >
         <component :is="item.content" ref="roleOrRecycle" :role-status="roleStatus"></component>
       </el-tab-pane>
+
+      <!-- 创建角色 -->
+      <el-tab-pane key="add" name="add" disabled>
+        <template #label>
+          <el-button type="primary" class="flex w-full" size="default" @click="handleCreateRole">
+            创建角色
+          </el-button>
+        </template>
+      </el-tab-pane>
+      <!-- 创建角色 -->
     </el-tabs>
   </div>
+  <!-- <Teleport to="#app">
+    <CreateRole ref="createRoleRef" :refresh="refresh" :role-status="roleStatus" />
+  </Teleport> -->
 </template>
 
 <style lang="scss" scoped>
-:deep(.el-tabs__content) {
-  flex: 1;
+.el-tabs {
+  :deep(.el-tabs__nav-wrap) {
+    &::after {
+      background-color: transparent !important;
+    }
+
+    .el-tabs__item {
+      &.is-disabled {
+        cursor: default !important;
+      }
+    }
+
+    .el-tabs__nav {
+      width: 100%;
+
+      #tab-add {
+        flex: 1;
+        display: flex;
+        justify-content: flex-end;
+
+        .el-button {
+          width: 100px;
+        }
+      }
+    }
+  }
+
+  /* :deep(.el-tabs__content) {
+    flex: 1;
+  }
+
+
+  :deep(.el-table__inner-wrapper) {
+    flex: 1;
+  } */
 }
 
 :deep(.el-card__body) {
   height: 100%;
 }
-
-:deep(.el-table__inner-wrapper) {
-  flex: 1;
-  /* max-height: 400px; */
-}
-
-.el-input,
-.el-option {
-  /* width: 20%; */
-  width: 200px;
-}
-/* .el-tabs--card {
-  height: calc(100vh - 110px);
-}
-.el-tab-pane {
-  height: calc(100vh - 110px);
-  overflow-y: auto;
-} */
 </style>

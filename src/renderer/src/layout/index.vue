@@ -69,15 +69,14 @@ console.log(tagMenuRef)
         <!-- main -->
 
         <main class="flex-1 h-full overflow-hidden m-4 drop-shadow-lg">
-          <el-card
+          <!-- <el-card
             shadow="always"
             class="h-full overflow-hidden"
             body-class="h-full overflow-hidden"
           >
-            <!-- <el-scrollbar> -->
             <router-view />
-            <!-- </el-scrollbar> -->
-          </el-card>
+          </el-card> -->
+          <router-view />
         </main>
 
         <!-- main -->

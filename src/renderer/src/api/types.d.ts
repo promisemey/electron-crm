@@ -14,3 +14,7 @@ export interface PageDataType {
   maxLimit?: unknown
   pages: number | string
 }
+
+export interface BaseResponse extends ResType {
+  data: PageDataType
+}
