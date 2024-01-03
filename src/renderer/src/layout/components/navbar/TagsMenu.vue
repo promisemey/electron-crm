@@ -1,67 +1,73 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
 import { TabsType } from '@types'
 import { watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useSelectMenu } from '@hooks/useSelectMenu'
 
-const initTabs = {
-  index: '/home',
-  title: '仪表盘',
-  path: '/dashboard'
-}
+import { useTabsStore } from '@store/tabsStore'
+import { storeToRefs } from 'pinia'
 
-const editableTabsValue = ref(JSON.stringify(initTabs))
-const editableTabs = ref([initTabs])
-const flag = ref<boolean>(true)
+const tabsStore = useTabsStore()
+const { addTab, removeTab } = tabsStore
+const { editableTabsValue, editableTabs, tabFlag } = storeToRefs(tabsStore)
+// const initTabs = {
+//   index: '/home',
+//   title: '仪表盘',
+//   path: '/dashboard'
+// }
 
-const addTab = (newTabs: TabsType) => {
-  const result = editableTabs.value.findIndex((item) => item.path === newTabs.path)
+// const editableTabsValue = ref(JSON.stringify(initTabs))
+// const editableTabs = ref([initTabs])
+// const flag = ref<boolean>(true)
 
-  if (result == -1) {
-    // editableTabs.value.push(newTabs)
-    editableTabs.value.push(newTabs)
-  }
+// const addTab = (newTabs: TabsType) => {
+//   const result = editableTabs.value.findIndex((item) => item.path === newTabs.path)
 
-  editableTabsValue.value = JSON.stringify(newTabs)
-}
+//   if (result == -1) {
+//     // editableTabs.value.push(newTabs)
+//     editableTabs.value.push(newTabs)
+//   }
 
-// 移除
-const removeTab = (targetName: string) => {
-  console.log(targetName, '----')
+//   editableTabsValue.value = JSON.stringify(newTabs)
+// }
 
-  flag.value = false
-  // 标签页数组
-  const tabs = editableTabs.value
-  // 选中页
-  let activeName = editableTabsValue.value
+// // 移除
+// const removeTab = (targetName: string) => {
+//   console.log(targetName, '----')
 
-  // 删除当前选中页
-  if (activeName === targetName) {
-    tabs.forEach((tab, index) => {
-      if (JSON.stringify(tab) === targetName) {
-        const nextTab = tabs[index + 1] || tabs[index - 1]
-        if (nextTab) {
-          activeName = JSON.stringify(nextTab)
-          // 跳转选中页
-          useSelectMenu(nextTab)
-        }
-      }
-    })
-  }
-  editableTabsValue.value = activeName
-  editableTabs.value = tabs.filter((tab) => JSON.stringify(tab) !== targetName)
-  // 防止自动添加
-  setTimeout(() => {
-    flag.value = true
-  }, 50)
-}
+//   flag.value = false
+//   // 标签页数组
+//   const tabs = editableTabs.value
+//   // 选中页
+//   let activeName = editableTabsValue.value
+
+//   // 删除当前选中页
+//   if (activeName === targetName) {
+//     tabs.forEach((tab, index) => {
+//       if (JSON.stringify(tab) === targetName) {
+//         const nextTab = tabs[index + 1] || tabs[index - 1]
+//         if (nextTab) {
+//           activeName = JSON.stringify(nextTab)
+//           // 跳转选中页
+//           useSelectMenu(nextTab)
+//         }
+//       }
+//     })
+//   }
+//   editableTabsValue.value = activeName
+//   editableTabs.value = tabs.filter((tab) => JSON.stringify(tab) !== targetName)
+//   // 防止自动添加
+//   setTimeout(() => {
+//     flag.value = true
+//   }, 50)
+// }
+
 const route = useRoute()
 
 watch(
   route,
   (nRoute) => {
-    if (!flag.value) return
+    if (!tabFlag.value) return
 
     const nTabs: TabsType = {
       index: nRoute.meta.parent as string,

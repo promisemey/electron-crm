@@ -5,7 +5,8 @@ import {
   GetUserPageResType,
   PostAddUserPayloadType,
   UpdateUserPayloadType,
-  UserCheckedResType
+  UserCheckedResType,
+  UserGrantRolePayloadType
 } from './types'
 import { ResType } from '@api/types'
 
@@ -35,4 +36,8 @@ export const getResetUserPwdApi = (id: string) => {
 
 export const getUserCheckedApi = (id: string) => {
   return request.get<UserCheckedResType>(`/system/user/checked/${id}`)
+}
+
+export const postUserGrantRoleApi = (params: UserGrantRolePayloadType[]) => {
+  return request.post<ResType>(`/system/user/grant`, params)
 }

@@ -67,3 +67,8 @@ export interface UserCheckedResType extends ResType {
     roles: RoleType[]
   }
 }
+
+export interface UserGrantRolePayloadType {
+  userId: string //用户ID
+  roleId: string //角色ID
+}

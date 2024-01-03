@@ -37,3 +37,9 @@ interface TabsType {
   path: string
   index: string
 }
+
+type TabsType = {
+  index: string
+  title: string
+  path: string
+}

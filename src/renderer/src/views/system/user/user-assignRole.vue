@@ -8,8 +8,9 @@ import type { FunctionalComponent } from 'vue'
 import type { CheckboxValueType, Column } from 'element-plus'
 import { FixedDir } from 'element-plus/es/components/table-v2/src/constants'
 import { useRoute } from 'vue-router'
-import { getUserCheckedApi } from '@api/user'
-import router from '@router'
+import { getUserCheckedApi, postUserGrantRoleApi } from '@api/user'
+import { useTabsStore } from '@store/tabsStore'
+import { UserGrantRolePayloadType } from '@api/user/types'
 
 const route = useRoute()
 
@@ -40,7 +41,7 @@ const columns: Column<unknown>[] = [
         // 删除未选中
         if (!value) checkMap.delete(rowData.id)
         // 添加选中
-        else checkMap.set(rowData.id, value)
+        else checkMap.set(rowData.id, query.userId)
       }
 
       return <SelectionCell value={Boolean(checkMap.get(rowData.id))} onChange={onChange} />
@@ -48,7 +49,7 @@ const columns: Column<unknown>[] = [
     headerCellRenderer: () => {
       const onChange = (value: CheckboxValueType) => {
         if (!value) return checkMap.clear()
-        tableData.forEach((item) => checkMap.set(item.id, value))
+        tableData.forEach((item) => checkMap.set(item.id, query.userId))
       }
       // 全选样式
       const allSelected = checkMap.size === tableData.length
@@ -81,11 +82,31 @@ const columns: Column<unknown>[] = [
 ]
 
 // 取消
+const tabsStore = useTabsStore()
+const { removeTab } = tabsStore
+
 const handleCancel = () => {
-  router.back()
+  const currentTab = { index: '/system', title: '分配角色', path: '/system/user/user-assignRole' }
+  removeTab(JSON.stringify(currentTab))
 }
 // 提交
-const handleSubmit = () => {}
+const loading = ref<boolean>(false)
+const handleSubmit = async () => {
+  // let
+  const payload: UserGrantRolePayloadType[] = []
+  for (const key in Object.fromEntries(checkMap)) {
+    payload.push({
+      userId: query.userId,
+      roleId: key
+    })
+  }
+
+  // return
+  loading.value = true
+  const res = await postUserGrantRoleApi(payload)
+  if (res.code == '200') handleCancel()
+  loading.value = false
+}
 
 const tableData = reactive<RoleType[]>([])
 // const tableData1 = []
@@ -97,13 +118,20 @@ const checkMap = reactive(new Map())
 
 // 基本信息
 type Query = { userId: string; userName: string; realName: string }
+const query = route.query as Query
+
 const formData = reactive({
   realName: '',
   userName: ''
 })
 onMounted(async () => {
+  // 内容区域
+  // 提前  防止获取不到高度 empty 不居中
+  const tableBody = document.querySelector('.el-table-v2__root')
+  height.value = tableBody!.getBoundingClientRect().height
+  width.value = tableBody!.getBoundingClientRect().width
+
   // 获取选中角色  全部角色
-  const query = route.query as Query
   const res = await getUserCheckedApi(query.userId)
 
   Object.assign(formData, query)
@@ -112,14 +140,9 @@ onMounted(async () => {
   const { checkedRoleIds, roles } = res.data
 
   // 当前用户选中的角色
-  checkedRoleIds.forEach((item) => checkMap.set(item, true))
+  checkedRoleIds.forEach((item) => checkMap.set(item, query.userId))
 
   Object.assign(tableData, roles)
-
-  // 内容区域
-  const tableBody = document.querySelector('.el-table-v2__root')
-  height.value = tableBody!.getBoundingClientRect().height
-  width.value = tableBody!.getBoundingClientRect().width
 })
 
 // 窗口大小改变 适应虚拟列表内容区
@@ -156,7 +179,7 @@ window.onresize = () => {
           <span class="font-bold">角色信息</span>
           <span class="submit">
             <el-button @click="handleCancel">取消</el-button>
-            <el-button type="primary" @click="handleSubmit">提交</el-button>
+            <el-button type="primary" :loading="loading" @click="handleSubmit">提交</el-button>
           </span>
         </div>
       </template>
