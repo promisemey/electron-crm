@@ -7,7 +7,7 @@ import { ElCheckbox } from 'element-plus'
 import type { FunctionalComponent } from 'vue'
 import type { CheckboxValueType, Column } from 'element-plus'
 import { FixedDir } from 'element-plus/es/components/table-v2/src/constants'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { getUserCheckedApi, postUserGrantRoleApi } from '@api/user'
 import { useTabsStore } from '@store/tabsStore'
 import { UserGrantRolePayloadType } from '@api/user/types'
@@ -84,10 +84,17 @@ const columns: Column<unknown>[] = [
 // 取消
 const tabsStore = useTabsStore()
 const { removeTab } = tabsStore
+const router = useRouter()
 
 const handleCancel = () => {
   const currentTab = { index: '/system', title: '分配角色', path: '/system/user/user-assignRole' }
-  removeTab(JSON.stringify(currentTab))
+  removeTab(JSON.stringify(currentTab), {
+    index: '/system',
+    title: '用户管理',
+    path: '/system/user'
+  })
+  // useSelectMenu({ path: '/system/user', title: '用户管理' }, 1)
+  router.push('/system/user')
 }
 // 提交
 const loading = ref<boolean>(false)

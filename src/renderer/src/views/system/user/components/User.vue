@@ -81,12 +81,12 @@ const handleAssignRole = (row: UserType) => {
 
   router.push({
     path: '/system/user/user-assignRole',
-    query: { userId: row.id, userName: row.username, realName: row.realName }
+    query: { userId: row.id, userName: row.username, realName: row.realName, card: 'nouse' }
   })
 }
 
-const getUserData = async () => {
-  const res = await getUserPageApi(formData)
+const getUserData = async (unitId = { unitId: '' }) => {
+  const res = await getUserPageApi({ ...formData, ...unitId })
 
   if (res.code == '200') {
     const { records, ...other } = res.data
@@ -136,9 +136,10 @@ const handleAdd = () => {
 const createStatus = ref<number>(1) // 默认添加
 // defineProps<{ roleStatus: Dictionary[] }>()
 
-// defineExpose({
-//   getRoleData
-// })
+defineExpose({
+  getUserData,
+  formData
+})
 </script>
 <template>
   <div class="role h-full flex flex-col">

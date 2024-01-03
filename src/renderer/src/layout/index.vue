@@ -69,14 +69,16 @@ console.log(tagMenuRef)
         <!-- main -->
 
         <main class="flex-1 h-full overflow-hidden m-4 drop-shadow-lg">
-          <!-- <el-card
+          <router-view v-if="$route.query.card == 'nouse'" />
+
+          <el-card
+            v-else
             shadow="always"
             class="h-full overflow-hidden"
             body-class="h-full overflow-hidden"
           >
             <router-view />
-          </el-card> -->
-          <router-view />
+          </el-card>
         </main>
 
         <!-- main -->

@@ -127,8 +127,6 @@ onBeforeMount(async () => {
   const localUserFields = localStorage.getItem('userFields')
   const parseLocal = localUserFields ? JSON.parse(localUserFields) : []
 
-  console.log(userId)
-
   if (parseLocal.length) {
     rolePage.value = parseLocal[0].value.data
     postPage.value = parseLocal[1].value.data

@@ -48,18 +48,13 @@ const roleStatus = reactive<Dictionary[]>([])
 onBeforeMount(async () => {
   const dist = await postDict<['system_global_status']>(['system_global_status'])
 
-  console.log(dist, '----')
-
   Object.assign(roleStatus, dist.system_global_status)
 })
 
 // 创建角色
 // const createRoleRef = ref()
 const handleCreateRole = () => {
-  console.log(roleOrRecycle.value[0])
   roleVisit.value = true
-
-  // createRoleRef.value.createRoleVisible = true
 }
 </script>
 <template>

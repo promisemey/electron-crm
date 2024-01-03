@@ -50,10 +50,26 @@ export const useSelectMenu = (active: MenuValType, level?: Level) => {
 }
 
 const useChangeMenuItem = ({ path, title }: MenuItem) => {
-  // console.log('path, title', path, title)
+  console.log('path, title', path, title)
 
   if (path && title) {
     menuStore.childDefaultActive = path
-    router.push(path)
+
+    // 是否使用 内容card
+    const noUse = ['user-assignRole', 'system/user']
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let cardPath: any = path
+    noUse.forEach((no) => {
+      if (path?.includes(no)) {
+        cardPath = {
+          path,
+          query: {
+            card: 'nouse'
+          }
+        }
+      }
+    })
+
+    router.push(cardPath)
   }
 }
