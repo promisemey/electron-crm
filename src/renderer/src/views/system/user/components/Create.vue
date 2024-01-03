@@ -52,12 +52,14 @@ const handleSubmit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate(async (valid, fields) => {
     if (valid) {
+      // 开启loading
       loading.value = true
 
       let res
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, ...other } = userFormData
 
+      // 添加/修改
       switch (props.createStatus) {
         case 0:
           res = await updateUserApi(other)
@@ -70,9 +72,11 @@ const handleSubmit = async (formEl: FormInstance | undefined) => {
       if (res.code == '200') {
         props.refresh()
         visible.value = false
+        formEl.resetFields()
+      } else {
+        ElMessage.error(res.msg)
       }
 
-      formEl.resetFields()
       loading.value = false
     } else {
       console.log('error submit!', fields)

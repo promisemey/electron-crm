@@ -1,3 +1,4 @@
+import { RoleType } from '@api/role/types'
 import { ResType } from '@api/types'
 
 type UserAttr = ['username', 'realName', 'email', 'phone', 'gender', 'enabled', 'unitId']
@@ -58,4 +59,11 @@ export interface UpdateUserPayloadType extends UserPage, RolePostId {
   remark: string
   gender: string | number
   enabled: string | number
+}
+
+export interface UserCheckedResType extends ResType {
+  data: {
+    checkedRoleIds: string[]
+    roles: RoleType[]
+  }
 }

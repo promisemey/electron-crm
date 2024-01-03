@@ -28,6 +28,8 @@ const addTab = (newTabs: TabsType) => {
 
 // 移除
 const removeTab = (targetName: string) => {
+  console.log(targetName, '----')
+
   flag.value = false
   // 标签页数组
   const tabs = editableTabs.value
@@ -49,11 +51,10 @@ const removeTab = (targetName: string) => {
   }
   editableTabsValue.value = activeName
   editableTabs.value = tabs.filter((tab) => JSON.stringify(tab) !== targetName)
+  // 防止自动添加
   setTimeout(() => {
     flag.value = true
   }, 50)
-
-  // console.log(editableTabs.value, '===-=-=--=-')
 }
 const route = useRoute()
 

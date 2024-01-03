@@ -1,12 +1,17 @@
 <!-- eslint-disable @typescript-eslint/no-non-null-assertion -->
 <script lang="tsx" setup>
-import { getAllRoleApi } from '@api/role'
 import { RoleType } from '@api/role/types'
-import { onMounted, ref, reactive, unref } from 'vue'
+import { onMounted, ref, reactive } from 'vue'
 import { ElCheckbox } from 'element-plus'
 
 import type { FunctionalComponent } from 'vue'
 import type { CheckboxValueType, Column } from 'element-plus'
+import { FixedDir } from 'element-plus/es/components/table-v2/src/constants'
+import { useRoute } from 'vue-router'
+import { getUserCheckedApi } from '@api/user'
+import router from '@router'
+
+const route = useRoute()
 
 type SelectionCellProps = {
   value: boolean
@@ -14,6 +19,7 @@ type SelectionCellProps = {
   onChange: (value: CheckboxValueType) => void
 }
 
+// 多选框
 const SelectionCell: FunctionalComponent<SelectionCellProps> = ({
   value,
   intermediate = false,
@@ -22,37 +28,32 @@ const SelectionCell: FunctionalComponent<SelectionCellProps> = ({
   return <ElCheckbox onChange={onChange} modelValue={value} indeterminate={intermediate} />
 }
 
-const formData = reactive({
-  realName: '',
-  username: ''
-})
-
-const columns: Column<any>[] = [
+// 列配置
+const columns: Column<unknown>[] = [
   {
     key: 'selection',
     width: 50,
-    cellRenderer: ({ rowData }) => {
-      const onChange = (value: CheckboxValueType) => (rowData.checked = value)
-      return <SelectionCell value={rowData.checked} onChange={onChange} />
+    fixed: FixedDir.LEFT,
+    align: 'center',
+    cellRenderer: ({ rowData }: { rowData: RoleType }) => {
+      const onChange = (value: CheckboxValueType) => {
+        // 删除未选中
+        if (!value) checkMap.delete(rowData.id)
+        // 添加选中
+        else checkMap.set(rowData.id, value)
+      }
+
+      return <SelectionCell value={Boolean(checkMap.get(rowData.id))} onChange={onChange} />
     },
     headerCellRenderer: () => {
-      const _data = unref(tableData)
-      const onChange = (value: CheckboxValueType) =>
-        Object.assign(
-          tableData,
-          _data.map((row) => {
-            if (row.checked == undefined) {
-              row.checked = value
-            }
-            row.checked = value
-
-            return row
-          })
-        )
-      const allSelected = _data.every((row) => row.checked)
-      const containsChecked = _data.some((row) => row.checked)
-
-      console.log(allSelected)
+      const onChange = (value: CheckboxValueType) => {
+        if (!value) return checkMap.clear()
+        tableData.forEach((item) => checkMap.set(item.id, value))
+      }
+      // 全选样式
+      const allSelected = checkMap.size === tableData.length
+      // 选中但未全选样式
+      const containsChecked = checkMap.size > 0
 
       return (
         <SelectionCell
@@ -64,34 +65,64 @@ const columns: Column<any>[] = [
     }
   },
   {
+    key: 'idd',
+    dataKey: 'id',
+    title: '角色编码',
+    width: 300
+  },
+  {
     key: 'roleName',
     dataKey: 'roleName',
     title: '角色名称',
     width: 200
   },
   { key: 'rolePerm', dataKey: 'rolePerm', title: '权限字符', width: 200 },
-  { key: 'createTime', dataKey: 'createTime', title: '创建时间', width: 200 }
+  { key: 'createTime', dataKey: 'createTime', title: '创建时间', width: 200, fixed: FixedDir.RIGHT }
 ]
 
+// 取消
+const handleCancel = () => {
+  router.back()
+}
+// 提交
+const handleSubmit = () => {}
+
 const tableData = reactive<RoleType[]>([])
+// const tableData1 = []
 
 // 虚拟列表  高度自适应
 const height = ref()
 const width = ref()
+const checkMap = reactive(new Map())
+
+// 基本信息
+type Query = { userId: string; userName: string; realName: string }
+const formData = reactive({
+  realName: '',
+  userName: ''
+})
 onMounted(async () => {
-  const res = await getAllRoleApi()
+  // 获取选中角色  全部角色
+  const query = route.query as Query
+  const res = await getUserCheckedApi(query.userId)
 
-  const data = res.data.map((item) => {
-    return { roleName: item.roleName, rolePerm: item.roleName, createTime: item.createTime }
-  })
+  Object.assign(formData, query)
 
-  Object.assign(tableData, data)
+  if (res.code != '200') return
+  const { checkedRoleIds, roles } = res.data
 
+  // 当前用户选中的角色
+  checkedRoleIds.forEach((item) => checkMap.set(item, true))
+
+  Object.assign(tableData, roles)
+
+  // 内容区域
   const tableBody = document.querySelector('.el-table-v2__root')
   height.value = tableBody!.getBoundingClientRect().height
   width.value = tableBody!.getBoundingClientRect().width
 })
 
+// 窗口大小改变 适应虚拟列表内容区
 window.onresize = () => {
   const tableBody = document.querySelector('.el-table-v2__root')
   height.value = tableBody!.getBoundingClientRect().height
@@ -114,34 +145,30 @@ window.onresize = () => {
           <el-input v-model="formData.realName" disabled></el-input>
         </el-form-item>
         <el-form-item label="用户名称">
-          <el-input v-model="formData.username" disabled></el-input>
+          <el-input v-model="formData.userName" disabled></el-input>
         </el-form-item>
       </el-form>
     </el-card>
 
     <el-card class="mt-5 flex flex-col flex-1 w-full" body-style="height:100%">
       <template #header>
-        <span class="font-bold">角色信息</span>
+        <div class="flex justify-between">
+          <span class="font-bold">角色信息</span>
+          <span class="submit">
+            <el-button @click="handleCancel">取消</el-button>
+            <el-button type="primary" @click="handleSubmit">提交</el-button>
+          </span>
+        </div>
       </template>
-      <div class="table bg-red-100 w-full h-full">
+      <div class="table w-full h-full">
         <el-table-v2
           :columns="columns"
           :data="tableData"
           class="!h-full !w-full"
           :width="+width"
           :height="+height"
+          fixed
         />
-        <!-- <el-auto-resizer>
-          <template #default="{ height, width }">
-            <el-table-v2
-              :columns="columns"
-              :data="tableData"
-              :width="width"
-              :height="height"
-              fixed
-            />
-          </template>
-        </el-auto-resizer> -->
       </div>
     </el-card>
   </div>

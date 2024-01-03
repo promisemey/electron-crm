@@ -73,8 +73,17 @@ const handleDel = (row: any) => {
 const handleResetPwd = (row: any) => {
   useConfirm(row.id, getResetUserPwdApi, getUserData, '此操作将重置为初始密码,是否继续?')
 }
+
 // 分配角色
-const handleAssignRole = (id: string) => {}
+const router = useRouter()
+const handleAssignRole = (row: UserType) => {
+  // /system/user/user-assignRole
+
+  router.push({
+    path: '/system/user/user-assignRole',
+    query: { userId: row.id, userName: row.username, realName: row.realName }
+  })
+}
 
 const getUserData = async () => {
   const res = await getUserPageApi(formData)
@@ -117,6 +126,7 @@ onBeforeMount(async () => {
 // 新增用户
 import Create from './Create.vue'
 import { useConfirm } from '@hooks/useConfirm'
+import { useRouter } from 'vue-router'
 const createRef = ref()
 const handleAdd = () => {
   createStatus.value = 1

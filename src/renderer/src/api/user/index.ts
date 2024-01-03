@@ -4,7 +4,8 @@ import {
   GetUserPagePayloadType,
   GetUserPageResType,
   PostAddUserPayloadType,
-  UpdateUserPayloadType
+  UpdateUserPayloadType,
+  UserCheckedResType
 } from './types'
 import { ResType } from '@api/types'
 
@@ -30,4 +31,8 @@ export const deleteUserApi = (id: string) => {
 
 export const getResetUserPwdApi = (id: string) => {
   return request.get<ResType>(`/system/user/reset/${id}`)
+}
+
+export const getUserCheckedApi = (id: string) => {
+  return request.get<UserCheckedResType>(`/system/user/checked/${id}`)
 }
