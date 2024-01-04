@@ -8,10 +8,10 @@ import { ref } from 'vue'
 import { useDictStore } from '@store/dictStore'
 import { reactive } from 'vue'
 import { Dictionary } from '@api/dictionary/types'
-import { useStore } from '@store'
+import { useMainStore } from '@store'
 import { storeToRefs } from 'pinia'
 // import CreateRole from './components/CreateRole.vue'
-const mainStore = useStore()
+const mainStore = useMainStore()
 const { roleVisit } = storeToRefs(mainStore)
 // 面板默认选中
 const activeName = ref('role')
@@ -48,18 +48,13 @@ const roleStatus = reactive<Dictionary[]>([])
 onBeforeMount(async () => {
   const dist = await postDict<['system_global_status']>(['system_global_status'])
 
-  console.log(dist, '----')
-
   Object.assign(roleStatus, dist.system_global_status)
 })
 
 // 创建角色
 // const createRoleRef = ref()
 const handleCreateRole = () => {
-  console.log(roleOrRecycle.value[0])
   roleVisit.value = true
-
-  // createRoleRef.value.createRoleVisible = true
 }
 </script>
 <template>

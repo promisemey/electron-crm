@@ -1,7 +1,7 @@
 import { useSelectMenu } from '@hooks/useSelectMenu'
 import { TabsType } from '@types'
 import { defineStore } from 'pinia'
-import { reactive, ref } from 'vue'
+import { ref } from 'vue'
 
 // 标签
 export const useTabsStore = defineStore('tabsStore', () => {
@@ -28,32 +28,35 @@ export const useTabsStore = defineStore('tabsStore', () => {
   }
 
   // 移除
-  const removeTab = (targetName: string) => {
+  const removeTab = (targetName: string, back?: TabsType) => {
     tabFlag.value = false
     // 标签页数组
     const tabs = editableTabs.value
     // 选中页
     let activeName = editableTabsValue.value
 
-    // 删除当前选中页
-    if (activeName === targetName) {
-      tabs.forEach((tab, index) => {
-        if (JSON.stringify(tab) === targetName) {
-          const nextTab = tabs[index + 1] || tabs[index - 1]
-          if (nextTab) {
-            activeName = JSON.stringify(nextTab)
-            // 跳转选中页
-            useSelectMenu(nextTab)
+    if (!back) {
+      // 删除当前选中页
+      if (activeName === targetName) {
+        tabs.forEach((tab, index) => {
+          if (JSON.stringify(tab) === targetName) {
+            const nextTab = tabs[index + 1] || tabs[index - 1]
+            if (nextTab) {
+              activeName = JSON.stringify(nextTab)
+              // 跳转选中页
+              useSelectMenu(nextTab)
+            }
           }
-        }
-      })
+        })
+      }
     }
-    editableTabsValue.value = activeName
+    editableTabsValue.value = back ? JSON.stringify(back) : activeName
+
     editableTabs.value = tabs.filter((tab) => JSON.stringify(tab) !== targetName)
     // 防止自动添加
     setTimeout(() => {
       tabFlag.value = true
-    }, 50)
+    }, 10)
   }
 
   return {

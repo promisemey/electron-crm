@@ -41,3 +41,7 @@ export const getUserCheckedApi = (id: string) => {
 export const postUserGrantRoleApi = (params: UserGrantRolePayloadType[]) => {
   return request.post<ResType>(`/system/user/grant`, params)
 }
+
+export const postCancelRoleApi = (params: UserGrantRolePayloadType[]) => {
+  return request.post<ResType>(`/system/role/cancel`, params)
+}

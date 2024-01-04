@@ -13,8 +13,12 @@ import './permission'
 //国际化
 import i18n from './locales/index'
 
+// lottie动画库
+
+// 公共组件
 import Pagination from '@components/Pagination.vue'
 import PrFome from '@components/PrForm/index.vue'
+import Loading from '@components/Loading.vue'
 
 const app = createApp(App)
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
@@ -24,6 +28,7 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 // 公共组件
 app.component('Pagination', Pagination)
 app.component('PrFome', PrFome)
+app.component('Loading', Loading)
 
 // 状态管理
 app.use(createPinia())

@@ -54,6 +54,22 @@ const useChangeMenuItem = ({ path, title }: MenuItem) => {
 
   if (path && title) {
     menuStore.childDefaultActive = path
-    router.push(path)
+
+    // 是否使用 内容card
+    const noUse = ['user-assignRole', 'system/user']
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let cardPath: any = path
+    noUse.forEach((no) => {
+      if (path?.includes(no)) {
+        cardPath = {
+          path,
+          query: {
+            card: 'nouse'
+          }
+        }
+      }
+    })
+
+    router.push(cardPath)
   }
 }

@@ -2,13 +2,13 @@
 import { Dictionary } from '@api/dictionary/types'
 import { getRoleDetailApi, getRoleTreeApi, postAddRoleApi, postUpdateRolelApi } from '@api/role'
 import { RoleTreeType } from '@api/role/types'
-import { useStore } from '@store'
+import { useMainStore } from '@store'
 import { ElTree } from 'element-plus'
 import { storeToRefs } from 'pinia'
 import { watch } from 'vue'
 import { onMounted, reactive } from 'vue'
 import { ref } from 'vue'
-const mainStore = useStore()
+const mainStore = useMainStore()
 const { roleVisit } = storeToRefs(mainStore)
 // 表单
 interface InitType {

@@ -1,4 +1,5 @@
 import { PageDataType, ResType } from '@api/types'
+import { UserType } from '@api/user/types'
 
 // 角色列表
 export interface GetRolePayloadyType {
@@ -91,3 +92,15 @@ export interface PostUpdateRolePayloadType extends PostAddRoleRayloadType {
   id: string
 }
 export interface PostUpdateRoleResType extends ResType {}
+
+export interface AssignUserPayloadType {
+  current: number
+  size: number
+  roleId: string
+  username?: string
+  mobile?: string
+}
+
+export interface AssignUserResType extends ResType {
+  data: { records: UserType[] } & PageDataType
+}

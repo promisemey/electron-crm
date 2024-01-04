@@ -2,7 +2,11 @@
 import User from './components/User.vue'
 import Recycle from './components/Recycle.vue'
 
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+import { onMounted } from 'vue'
+import { getUnitTreeApi } from '@api/unit'
+import { UnitTreeType } from '@api/unit/types'
+import { ElTree } from 'element-plus'
 
 // 面板默认选中
 const activeName = ref('user')
@@ -21,11 +25,68 @@ const editableTabs = [
   }
 ]
 
-const roleOrRecycle = ref()
+const userOrRecycle = ref()
+
+const unitForm = ref<string>('')
+
+interface Tree {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any
+}
+
+watch(unitForm, (val) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  treeRef.value!.filter(val)
+})
+// 过滤树节点
+const treeRef = ref<InstanceType<typeof ElTree>>()
+const filterNode = (value: string, data: Tree) => {
+  if (!value) return true
+  return data.name.includes(value)
+}
+
+const handleNodeClick = (data: Tree) => {
+  const userRef = userOrRecycle.value[0]
+
+  userRef.getUserData({ unitId: data.id })
+}
+
+const defaultProps = {
+  children: 'children',
+  label: 'name'
+}
+
+const data = ref<UnitTreeType[]>([])
+
+onMounted(async () => {
+  const res = await getUnitTreeApi()
+  if (res.code == '200') data.value = res.data
+})
 </script>
 <template>
-  <div class="role h-full overflow-hidden">
-    <el-tabs v-model="activeName" class="h-full flex flex-col !border-none">
+  <div class="role h-full overflow-hidden flex">
+    <div class="w-[280px] h-full bg-white border">
+      <el-input
+        v-model="unitForm"
+        prefix-icon="Search"
+        placeholder="请输入部门名称"
+        class="p-4 border-b"
+        clearable
+      ></el-input>
+      <el-tree
+        ref="treeRef"
+        :data="data"
+        :props="defaultProps"
+        :default-expand-all="true"
+        class="p-4 border-b"
+        :filter-node-method="filterNode"
+        @node-click="handleNodeClick"
+      />
+    </div>
+    <el-tabs
+      v-model="activeName"
+      class="h-full flex-1 bg-white overflow-hidden p-3 flex flex-col !border-none"
+    >
       <el-tab-pane
         v-for="item in editableTabs"
         :key="item.name"
@@ -33,13 +94,10 @@ const roleOrRecycle = ref()
         :name="item.name"
         class="h-full"
       >
-        <component :is="item.content" ref="roleOrRecycle"></component>
+        <component :is="item.content" :key="item.name" ref="userOrRecycle"></component>
       </el-tab-pane>
     </el-tabs>
   </div>
-  <!-- <Teleport to="#app">
-    <CreateRole ref="createRoleRef" :refresh="refresh" :role-status="roleStatus" />
-  </Teleport> -->
 </template>
 
 <style lang="scss" scoped>

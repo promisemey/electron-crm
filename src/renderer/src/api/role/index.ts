@@ -1,5 +1,7 @@
 import request from '@utils/request'
 import {
+  AssignUserPayloadType,
+  AssignUserResType,
   GetAllRoleResType,
   GetDelRoleResType,
   GetRoleDetailResType,
@@ -28,7 +30,7 @@ export const postAddRoleApi = (params: PostAddRoleRayloadType) => {
   return request.post<PostAddRoleResType>('/system/role/add', params)
 }
 
-export const getDelRoleApi = (params: number) => {
+export const getDelRoleApi = (params: number | string) => {
   return request.get<GetDelRoleResType>(`/system/role/delete/${params}`)
 }
 
@@ -38,4 +40,8 @@ export const getRoleDetailApi = (params: string) => {
 
 export const postUpdateRolelApi = (params: PostUpdateRolePayloadType) => {
   return request.post<PostUpdateRoleResType>(`/system/role/update`, params)
+}
+
+export const GetAssignUserApi = (params: AssignUserPayloadType) => {
+  return request.get<AssignUserResType>(`/system/role/assigned`, params)
 }

@@ -28,7 +28,7 @@ export const useMenuStore = defineStore('menuStore', () => {
     if (!component) return
     const module = import.meta.glob('@renderer/views/**/*.vue')
 
-    // component = component.match('index')?.length >= 1 ? component : `${component}/index`
+    component = component.match('home')?.length >= 1 ? `${component}/index` : component
     return module[`/src/views/${component}.vue`]
   }
 

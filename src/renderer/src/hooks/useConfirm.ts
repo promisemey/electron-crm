@@ -1,13 +1,13 @@
 import { ResType } from '@api/types'
 import { ElMessageBox, ElMessage } from 'element-plus'
 
-type DeleApi = (id: string) => Promise<ResType>
+type RequestApi = (params: any) => Promise<ResType>
 
 type TableData = () => void
 
 export const useConfirm = (
-  id: string,
-  deleteApi: DeleApi,
+  params: unknown,
+  requestApi: RequestApi,
   onTableData: TableData,
   text?: string
 ) => {
@@ -17,13 +17,14 @@ export const useConfirm = (
     cancelButtonText: '取消',
     type: 'warning'
   })
-    .then(async () => {
+    .then(async (): Promise<any> => {
       // 确认去请求接口让后端把仓库数据删掉
       // ElMessage.error('等待请求接口')
-      const { code, msg } = await deleteApi(id)
+      const { code, msg } = await requestApi(params)
       if (code == '200') {
         onTableData() // 获取最新数据
         ElMessage.success(msg)
+        return true
       } else {
         ElMessage.error(msg)
       }
