@@ -8,10 +8,10 @@ import { ref } from 'vue'
 import { useDictStore } from '@store/dictStore'
 import { reactive } from 'vue'
 import { Dictionary } from '@api/dictionary/types'
-import { useStore } from '@store'
+import { useMainStore } from '@store'
 import { storeToRefs } from 'pinia'
 // import CreateRole from './components/CreateRole.vue'
-const mainStore = useStore()
+const mainStore = useMainStore()
 const { roleVisit } = storeToRefs(mainStore)
 // 面板默认选中
 const activeName = ref('role')

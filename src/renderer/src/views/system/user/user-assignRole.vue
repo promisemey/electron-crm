@@ -52,7 +52,7 @@ const columns: Column<unknown>[] = [
         tableData.forEach((item) => checkMap.set(item.id, query.userId))
       }
       // 全选样式
-      const allSelected = checkMap.size === tableData.length
+      const allSelected = Boolean(checkMap.size) && checkMap.size === tableData.length
       // 选中但未全选样式
       const containsChecked = checkMap.size > 0
 
@@ -94,6 +94,7 @@ const handleCancel = () => {
     path: '/system/user'
   })
   // useSelectMenu({ path: '/system/user', title: '用户管理' }, 1)
+
   router.push('/system/user')
 }
 // 提交

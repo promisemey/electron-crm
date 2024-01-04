@@ -1,4 +1,5 @@
 // 导入Axios
+import { useMainStore } from '@store'
 import type { AxiosInstance, AxiosRequestConfig, AxiosError, AxiosResponse } from 'axios'
 import axios from 'axios' // pnpm add axios
 
@@ -14,6 +15,8 @@ const request: AxiosInstance = axios.create({
 // 请求拦截器
 request.interceptors.request.use(
   (config) => {
+    const mainStore = useMainStore()
+    mainStore.loading = true
     const token = localStorage.getItem('token')
     if (token) {
       config.headers.Authorization = token
@@ -28,9 +31,16 @@ request.interceptors.request.use(
 // 响应拦截器
 request.interceptors.response.use(
   (response: AxiosResponse) => {
+    const mainStore = useMainStore()
+
+    mainStore.loading = false
+    // setTimeout(() => {
+    // }, 500)
     return response.data
   },
   (error: AxiosError) => {
+    // const mainStore = useMainStore()
+    // mainStore.loading = false
     return Promise.reject(error)
   }
 )

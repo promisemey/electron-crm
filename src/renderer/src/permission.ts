@@ -1,14 +1,11 @@
 import router from '@router'
 import { useMenuStore } from '@store/menuStore'
-// import { useDyRoutesStore } from '@store/dyRoutesStore'
-
-// 添加路由
+import { useRoute } from 'vue-router'
 
 // 全局前置导航守卫
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, _from, next) => {
   const white = ['/login']
   const token = localStorage.getItem('token')
-
   const menuStore = useMenuStore()
   const { getMenuInfo } = menuStore
 
@@ -20,10 +17,10 @@ router.beforeEach(async (to, from, next) => {
     if (!token) {
       next('/login')
     }
-
     // 加载动态路由
     await getMenuInfo()
 
+    // console.log(router.getRoutes())
     if (!to.redirectedFrom) {
       next({ ...to, replace: true })
     } else {

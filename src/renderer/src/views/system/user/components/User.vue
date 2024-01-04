@@ -136,6 +136,8 @@ const handleAdd = () => {
 const createStatus = ref<number>(1) // 默认添加
 // defineProps<{ roleStatus: Dictionary[] }>()
 
+const isExpand = ref<boolean>(false)
+
 defineExpose({
   getUserData,
   formData
@@ -144,42 +146,43 @@ defineExpose({
 <template>
   <div class="role h-full flex flex-col">
     <!-- 筛选 -->
-    <el-card shadow="always" class="mb-5 flex items-center" body-class="w-full">
-      <el-form
-        ref="form"
-        :model="formData"
-        :inline="true"
-        label-width="80"
-        class="-mb-5 flex flex-wrap"
-      >
+    <el-card shadow="never" class="mb-5 flex items-center" body-class="w-full">
+      <el-form ref="form" :model="formData" label-width="80" class="-mb-5 flex flex-wrap">
         <el-form-item label="用户名称">
           <el-input v-model="formData.username" placeholder="请输入角色名称"></el-input>
         </el-form-item>
         <el-form-item label="姓名">
           <el-input v-model="formData.realName" placeholder="请输入角色编码"></el-input>
         </el-form-item>
-        <el-form-item label="邮箱">
+
+        <el-form-item v-show="isExpand" label="邮箱">
           <el-input v-model="formData.email" placeholder="请输入角色编码"></el-input>
         </el-form-item>
-        <el-form-item label="手机号">
+        <el-form-item v-show="isExpand" label="手机号">
           <el-input v-model="formData.phone" placeholder="请输入角色编码"></el-input>
         </el-form-item>
-        <el-form-item label="性别">
+        <el-form-item v-show="isExpand" label="性别">
           <el-select v-model="formData.gender" placeholder="请选择性别" clearable filterable>
             <el-option v-for="item in gender" :key="item.id" :label="item.k" :value="item.v">
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="状态">
+        <el-form-item v-show="isExpand" label="状态">
           <el-select v-model="formData.enabled" placeholder="请选择启用状态" clearable filterable>
             <el-option v-for="item in status" :key="item.id" :label="item.k" :value="item.v">
             </el-option>
           </el-select>
         </el-form-item>
+
         <el-row class="">
           <el-form-item label-width="10" label=" ">
             <el-button type="primary" @click="onSubmit">搜索</el-button>
             <el-button @click="onReset">重置</el-button>
+            <el-button link type="primary" @click="isExpand = !isExpand">
+              {{ isExpand ? '收起' : '展开' }}
+              <el-icon v-if="isExpand"><ArrowUpBold /></el-icon>
+              <el-icon v-else><ArrowDownBold /></el-icon>
+            </el-button>
           </el-form-item>
         </el-row>
       </el-form>
@@ -187,7 +190,7 @@ defineExpose({
     <!-- 筛选 -->
 
     <!-- table -->
-    <el-card shadow="always" class="flex-1" body-class="flex flex-col">
+    <el-card shadow="never" class="flex-1" body-class="flex flex-col">
       <div class="mb-4">
         <el-button type="primary" icon="Plus" @click="handleAdd">新增</el-button>
       </div>

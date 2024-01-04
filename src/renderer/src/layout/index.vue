@@ -6,7 +6,7 @@ import MenuItem from './components/menu/MenuItem.vue'
 import Logo from '@components/Logo.vue'
 import BreadCrums from './components/navbar/BreadCrums.vue'
 import Tools from './components/navbar/Tools.vue'
-import TagsMenu from './components/navbar/TagsMenu.vue'
+import Main from './components/main/Main.vue'
 import { onMounted } from 'vue'
 // 调整窗口大小
 onMounted(() => {
@@ -57,31 +57,12 @@ console.log(tagMenuRef)
           <!-- <el-button type="primary" size="default" @click="addTab"></el-button> -->
 
           <!-- 工具 -->
-          <Tools class="drop-shadow-none" />
+          <Tools />
           <!-- 工具 -->
         </div>
         <!-- navbar -->
 
-        <!-- tag -->
-        <TagsMenu ref="tagMenuRef" />
-        <!-- tag -->
-
-        <!-- main -->
-
-        <main class="flex-1 h-full overflow-hidden m-4 drop-shadow-lg">
-          <router-view v-if="$route.query.card == 'nouse'" />
-
-          <el-card
-            v-else
-            shadow="always"
-            class="h-full overflow-hidden"
-            body-class="h-full overflow-hidden"
-          >
-            <router-view />
-          </el-card>
-        </main>
-
-        <!-- main -->
+        <Main></Main>
       </div>
 
       <!-- 内容区 -->

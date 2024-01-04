@@ -65,7 +65,7 @@ onMounted(async () => {
 </script>
 <template>
   <div class="role h-full overflow-hidden flex">
-    <div class="w-[280px] h-full bg-white mr-5 border">
+    <div class="w-[280px] h-full bg-white border">
       <el-input
         v-model="unitForm"
         prefix-icon="Search"
@@ -83,7 +83,10 @@ onMounted(async () => {
         @node-click="handleNodeClick"
       />
     </div>
-    <el-tabs v-model="activeName" class="h-full flex-1 overflow-hidden flex flex-col !border-none">
+    <el-tabs
+      v-model="activeName"
+      class="h-full flex-1 bg-white overflow-hidden p-3 flex flex-col !border-none"
+    >
       <el-tab-pane
         v-for="item in editableTabs"
         :key="item.name"
@@ -91,7 +94,7 @@ onMounted(async () => {
         :name="item.name"
         class="h-full"
       >
-        <component :is="item.content" ref="userOrRecycle"></component>
+        <component :is="item.content" :key="item.name" ref="userOrRecycle"></component>
       </el-tab-pane>
     </el-tabs>
   </div>

@@ -50,7 +50,7 @@ export const useSelectMenu = (active: MenuValType, level?: Level) => {
 }
 
 const useChangeMenuItem = ({ path, title }: MenuItem) => {
-  console.log('path, title', path, title)
+  // console.log('path, title', path, title)
 
   if (path && title) {
     menuStore.childDefaultActive = path

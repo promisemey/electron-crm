@@ -10,9 +10,10 @@ import { reactive } from 'vue'
 import { PageDataType } from '@api/types'
 import { useConfirm } from '@hooks/useConfirm'
 import CreateRole from './CreateRole.vue'
-import { useStore } from '@store'
+import { useMainStore } from '@store'
 import { storeToRefs } from 'pinia'
-const mainStore = useStore()
+import router from '@router'
+const mainStore = useMainStore()
 const { roleVisit } = storeToRefs(mainStore)
 
 // table数据
@@ -77,24 +78,30 @@ const getRoleData = async () => {
   }
 }
 
-onBeforeMount(() => {
-  getRoleData()
-})
-
 // const id = ref<string>()
 // table
 const handleEdit = (row: RoleType) => {
+  console.log(row)
+
   roleVisit.value = true
   createRoleRef.value.formData.id = row.id as string
   createRoleRef.value.getDetail(row.id)
 }
-const handleDel = async (id: number) => {
+const handleDel = async (id: string) => {
   useConfirm(id, getDelRoleApi, getRoleData)
   // const res = await getDelRoleApi(id)
+}
+// 角色授权
+const handleAssign = (id: number) => {
+  router.push({ path: '/system/role/role-assign', query: { roleId: id } })
 }
 
 // 创建角色
 const createRoleRef = ref()
+
+onBeforeMount(() => {
+  getRoleData()
+})
 
 defineProps<{ roleStatus: Dictionary[] }>()
 
@@ -164,9 +171,10 @@ defineExpose({
         <el-table-column fixed="right" label="操作" width="200">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click="handleEdit(row)">编辑</el-button>
-            <el-button link type="primary" size="small" @click="handleDel(row.id)">删除</el-button>
-            <el-button link type="primary" size="small" @click="handleEdit"></el-button>
-            <el-button link type="primary" size="small">Edit</el-button>
+            <el-button link type="danger" size="small" @click="handleDel(row.id)">删除</el-button>
+            <el-button link type="success" size="small" @click="handleAssign(row.id)"
+              >角色授权</el-button
+            >
           </template>
         </el-table-column>
       </el-table>

@@ -30,9 +30,13 @@ const onChangeRoutes = (path: string, title: string) => {
           :collapse-transition="true"
         >
           <template v-for="item in menuStore.childMenu" :key="item.id">
-            <el-menu-item :index="item.path" @click="onChangeRoutes(item.path, item.meta.title)">
+            <el-menu-item
+              v-if="item.meta.icon && !item.path.includes('assign')"
+              :index="item.path"
+              @click="onChangeRoutes(item.path, item.meta.title)"
+            >
               <el-icon>
-                <component :is="item.meta.icon.replace('el-icon-', '') || 'user'"></component>
+                <component :is="item.meta.icon.replace('el-icon-', '')"></component>
               </el-icon>
               <template #title>{{ item.meta.title }}</template>
             </el-menu-item>
