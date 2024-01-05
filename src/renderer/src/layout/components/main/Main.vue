@@ -1,4 +1,5 @@
-<script lang="ts" setup>
+<script lang="tsx" setup>
+import { RouterView } from 'vue-router'
 import TagsMenu from '../navbar/TagsMenu.vue'
 </script>
 <template>
@@ -10,7 +11,6 @@ import TagsMenu from '../navbar/TagsMenu.vue'
 
     <RouterView v-slot="{ Component, route }">
       <template v-if="Component">
-        <!-- {{ $router.getRoutes() }} -->
         <keep-alive>
           <Suspense>
             <template #default>
@@ -21,26 +21,19 @@ import TagsMenu from '../navbar/TagsMenu.vue'
                 class="h-full overflow-hidden"
                 body-class="h-full overflow-hidden"
               >
-                <component :is="Component" :key="route.fullPath" />
+                <keep-alive>
+                  <component :is="Component" :key="route.fullPath" />
+                </keep-alive>
               </el-card>
             </template>
-            <template #fallback> <Loading /></template>
+            <template #fallback>
+              <Loading />
+            </template>
           </Suspense>
         </keep-alive>
+        <Loading />
       </template>
     </RouterView>
-
-    <!-- <router-view v-if="$route.query.card == 'nouse'" />
-
-    <el-card
-      v-else
-      shadow="always"
-      class="h-full overflow-hidden"
-      body-class="h-full overflow-hidden"
-    >
-      <router-view />
-    </el-card>
-    <Loading /> -->
   </main>
   <!-- main -->
 </template>
