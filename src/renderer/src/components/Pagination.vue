@@ -28,11 +28,11 @@ withDefaults(
 <template>
   <div class="pt-5 flex justify-center">
     <el-pagination
-      :current-page="current"
-      :page-size="size"
+      :current-page="+current"
+      :page-size="+size"
       background
       layout="sizes, prev, pager, next, jumper"
-      :page-count="count"
+      :page-count="+count"
       @size-change="onSizeChange"
       @current-change="onCurrentChange"
     />

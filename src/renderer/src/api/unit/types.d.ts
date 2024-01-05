@@ -28,3 +28,25 @@ export type UnitTreeType = {
 export interface GetUnitTreeResType extends ResType {
   data: UnitTreeType[]
 }
+
+export interface GetUnitPayloadType {
+  name?: string
+  enabled?: number | string
+  code?: string
+}
+
+export interface GetUnitResType extends ResType {
+  data: UnitType[]
+}
+
+export interface AddUnitPayloadType {
+  name: string //机构名称
+  contact: string // 联系人
+  mobile: string // 联系人手机
+  email: string // 联系人邮箱
+  web: string // 网址
+  parentId: string // 上级机构ID
+  enabled: string | number // 是否启用（0：禁用；1：启用）
+  leaderId?: any | null // 领导人ID
+  address: string // 地址
+}
