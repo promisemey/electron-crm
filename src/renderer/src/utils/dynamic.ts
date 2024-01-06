@@ -44,3 +44,12 @@ export const mapRoutes = () => {
 
   return addRouteDy(menuInfo.value)
 }
+
+const menuSort = (menu: RecordsItem[]) => {
+  menu.forEach((item: RecordsItem) => {
+    if (Array.isArray(item.children) && item.children.length >= 2) {
+      menuSort(item.children)
+    }
+  })
+  return menu.sort((a, b) => a.sort - b.sort)
+}

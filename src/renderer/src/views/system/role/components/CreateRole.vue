@@ -84,19 +84,9 @@ onMounted(async () => {
     }, [])
   }
 
-  // const result = res.data.records.reduce((acc: Map<string, RecordsItem[]>, cur: RecordsItem) => {
-  //   if (!acc.has(cur.parentId)) {
-  //     acc.set(cur.parentId, [cur])
-  //   } else {
-  //     acc.get(cur.parentId)?.push(cur)
-  //   }
+  const result = flatMenu(res.data.records.filter((item) => !item.path.includes('//')))
 
-  //   return acc
-  // }, map)
-
-  // res.data.records.forEach()
-
-  menuTreeAuth.value = flatMenu(res.data.records)
+  menuTreeAuth.value = result
 })
 
 const handleSubmit = async () => {
@@ -133,7 +123,7 @@ const props = defineProps<{
 const getDetail = async (id) => {
   const res = await getRoleDetailApi(String(id))
   if (res.code == '200') {
-    Object.assign(formData, { ...res.data.role })
+    Object.assign(formData, { ...res.data.role, enabled: res.data.role.enabled.toString() })
     treeRef.value?.setCheckedKeys([...res.data.permissions])
   }
 }

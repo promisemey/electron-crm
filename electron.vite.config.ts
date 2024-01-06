@@ -23,7 +23,8 @@ export default defineConfig({
         '@store': resolve('src/renderer/src/store'),
         '@hooks': resolve('src/renderer/src/hooks'),
         '@router': resolve('src/renderer/src/router'),
-        '@utils': resolve('src/renderer/src/utils')
+        '@utils': resolve('src/renderer/src/utils'),
+        '@directives': resolve('src/renderer/src/directives')
       }
     },
     plugins: [

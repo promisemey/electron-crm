@@ -39,6 +39,7 @@ export interface UserInfo {
   enabled: 0 | 1 //帐号状态（0：禁用；1：正常
   delFlag: 0 | 1 //是否删除（0：有效；1：删除）
   remark: string | null //备注
+  permissions: string[]
 }
 export interface Permissions {
   [index: number]: string

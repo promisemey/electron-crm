@@ -19,11 +19,15 @@ export const useUserStore = defineStore('userStore', () => {
   // 获取用户数据
   const getUserInfo = async () => {
     const res = await getUserInfoApi()
+    console.log(res, '====login')
+
     if (res.code == 200) {
       const {
         data: { userInfo: info, roles }
         // data: { userInfo: info, roles, wechat, permissions, units }
       } = res
+
+      console.log(res, '====login')
 
       Object.assign(userInfo, info)
       role.value = roles

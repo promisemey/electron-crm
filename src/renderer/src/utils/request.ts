@@ -34,8 +34,7 @@ request.interceptors.response.use(
     const mainStore = useMainStore()
 
     mainStore.loading = false
-    // setTimeout(() => {
-    // }, 500)
+
     return response.data
   },
   (error: AxiosError) => {

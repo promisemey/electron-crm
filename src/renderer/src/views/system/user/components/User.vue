@@ -241,12 +241,36 @@ defineExpose({
 
         <el-table-column fixed="right" a label="操作" width="250" :resizable="false">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" @click="handleEdit(row)">编辑</el-button>
-            <el-button link type="danger" size="small" @click="handleDel(row)">删除</el-button>
-            <el-button link type="warning" size="small" @click="handleResetPwd(row)"
+            <el-button
+              v-auth="'system:user:update1'"
+              link
+              type="primary"
+              size="small"
+              @click="handleEdit(row)"
+              >编辑</el-button
+            >
+            <el-button
+              v-auth="'system:user:delete'"
+              link
+              type="danger"
+              size="small"
+              @click="handleDel(row)"
+              >删除</el-button
+            >
+            <el-button
+              v-auth="'system:user:reset'"
+              link
+              type="warning"
+              size="small"
+              @click="handleResetPwd(row)"
               >重置密码</el-button
             >
-            <el-button link type="success" size="small" @click="handleAssignRole(row)"
+            <el-button
+              v-auth="'system:user:grant'"
+              link
+              type="success"
+              size="small"
+              @click="handleAssignRole(row)"
               >分配角色</el-button
             >
             <!-- <el-button link type="primary" size="small" @click="handleEdit"></el-button>

@@ -5,6 +5,7 @@ import { reactive, ref } from 'vue'
 import { ComponentViews, MenuStore, ResetMenu, RoutesItem } from '@types'
 import router from '@router'
 import { Menu } from '@api/common/types'
+import { RecordsItem } from '@api/role/types'
 // import { RouteRecordRaw } from 'vue-router'
 
 export const useMenuStore = defineStore('menuStore', () => {
@@ -83,7 +84,8 @@ export const useMenuStore = defineStore('menuStore', () => {
         const menuInfo = await getMenuInfoApi(rolePerm.value)
 
         if (menuInfo.code == 200) {
-          menu_info.value = menuInfo.data
+          menu_info.value = menuInfo.data.filter((item) => !item.path.includes('//'))
+
           localStorage.setItem('menu_info', JSON.stringify(menu_info.value))
           setDyRoutes(menu_info.value)
         }
