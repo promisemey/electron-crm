@@ -76,13 +76,14 @@ const handleResetPwd = (row: any) => {
 
 // 分配角色
 const router = useRouter()
+// const userStore = useUserStore()
+// const { assignUserId } = storeToRefs(userStore)
 const handleAssignRole = (row: UserType) => {
-  // /system/user/user-assignRole
-
   router.push({
     path: '/system/user/user-assignRole',
     query: { userId: row.id, userName: row.username, realName: row.realName, card: 'nouse' }
   })
+  // assignUserId.value = row.id
 }
 
 const getUserData = async (unitId = { unitId: '' }) => {
@@ -134,6 +135,8 @@ onBeforeMount(async () => {
 import Create from './Create.vue'
 import { useConfirm } from '@hooks/useConfirm'
 import { useRouter } from 'vue-router'
+// import { storeToRefs } from 'pinia'
+// import { useUserStore } from '@store/userStore'
 const createRef = ref()
 const handleAdd = () => {
   createStatus.value = 1

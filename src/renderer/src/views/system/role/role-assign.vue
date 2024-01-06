@@ -1,7 +1,7 @@
 <!-- eslint-disable @typescript-eslint/no-non-null-assertion -->
 <script lang="tsx" setup>
 import { AssignUserPayloadType, RoleType } from '@api/role/types'
-import { onMounted, ref, reactive } from 'vue'
+import { ref, reactive, onActivated } from 'vue'
 import { ElButton, ElCheckbox } from 'element-plus'
 
 import type { FunctionalComponent } from 'vue'
@@ -114,13 +114,6 @@ const columns: Column<unknown>[] = [
   }
 ]
 
-// 翻页
-// const handleScroll = () => {
-//   if (AssignUserData.current >= pages.value) return
-//   AssignUserData.current += 1
-//   getAssignUser()
-// }
-
 // 取消
 const tabsStore = useTabsStore()
 const { removeTab } = tabsStore
@@ -179,9 +172,7 @@ const AssignUserData = reactive<AssignUserPayloadType>({
   size: 10,
   roleId: ''
 })
-// 请求参数  角色Id
-type Query = { roleId: string }
-const query = route.query as Query
+
 const getAssignUser = async () => {
   // 获取角色授权
   const res = await GetAssignUserApi(AssignUserData)
@@ -194,13 +185,29 @@ const getAssignUser = async () => {
   const result = await GetAssignUserApi(AssignUserData)
 
   tableData.value = result.data.records
-
-  console.log(tableData, '=======', result.data.records)
 }
 
-onMounted(() => {
+// 请求参数  角色Id
+type Query = { roleId: string }
+
+const query = reactive<Query>({ roleId: '' })
+
+onActivated(() => {
+  query.roleId = (route.query as Query).roleId
+  console.log('进入角色授权 => ', query, !query.roleId)
+  if (query.roleId) {
+    localStorage.setItem('role-assign', query.roleId)
+    console.log('set => ', query)
+  }
+
+  if (!query.roleId) {
+    const localUserAssign = localStorage.getItem('role-assign')
+    query.roleId = localUserAssign ? localUserAssign : ''
+    console.log('get => ', query, tableData.value)
+  }
+
   // 角色Id
-  Object.assign(AssignUserData, query)
+  Object.assign(AssignUserData, { roleId: query.roleId })
   getAssignUser()
 })
 </script>

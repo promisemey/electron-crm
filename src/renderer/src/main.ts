@@ -1,26 +1,17 @@
 import '@assets/css/tailwind.css'
-import router from '@renderer/router/index'
-import { createPinia } from 'pinia'
-import { createApp } from 'vue'
-import App from './App.vue'
-
-// 如果您正在使用CDN引入，请删除下面一行。
-import * as ElementPlusIconsVue from '@element-plus/icons-vue'
-import 'element-plus/es/components/message-box/style/index'
-
-import './permission'
-
-//国际化
-import i18n from './locales/index'
-
-// lottie动画库
-
-// 公共组件
 import Loading from '@components/Loading.vue'
 import Pagination from '@components/Pagination.vue'
 import PrFome from '@components/PrForm/index.vue'
-
 import { ButtonAuthDirective } from '@directives/auth'
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+import router from '@renderer/router/index'
+import 'element-plus/es/components/message-box/style/index'
+import { createPinia } from 'pinia'
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+import { createApp } from 'vue'
+import App from './App.vue'
+import i18n from './locales/index'
+import './permission'
 
 const app = createApp(App)
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
@@ -34,8 +25,11 @@ app.component('Loading', Loading)
 
 app.directive(ButtonAuthDirective.name, ButtonAuthDirective)
 
+const pinia = createPinia()
+pinia.use(piniaPluginPersistedstate)
+
 // 状态管理
-app.use(createPinia())
+app.use(pinia)
 app.use(router)
 app.use(i18n)
 app.mount('#app')

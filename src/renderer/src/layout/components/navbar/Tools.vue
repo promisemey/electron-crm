@@ -25,10 +25,7 @@ const onExit = () => {
       useResetPinia()
       window.electron.ipcRenderer.invoke('user-logout')
     })
-    .catch((e) => {
-      console.log(e)
-      useResetPinia()
-
+    .catch(() => {
       ElMessage({
         type: 'info',
         message: '取消退出'

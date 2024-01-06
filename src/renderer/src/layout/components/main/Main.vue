@@ -15,6 +15,7 @@ import TagsMenu from '../navbar/TagsMenu.vue'
           <Suspense>
             <template #default>
               <component :is="Component" v-if="route.query.card == 'nouse'" :key="route.fullPath" />
+
               <el-card
                 v-else
                 shadow="always"
@@ -27,7 +28,7 @@ import TagsMenu from '../navbar/TagsMenu.vue'
               </el-card>
             </template>
             <template #fallback>
-              <Loading />
+              <h1>Loading</h1>
             </template>
           </Suspense>
         </keep-alive>

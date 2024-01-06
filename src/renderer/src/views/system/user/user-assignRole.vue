@@ -1,7 +1,7 @@
 <!-- eslint-disable @typescript-eslint/no-non-null-assertion -->
 <script lang="tsx" setup>
 import { RoleType } from '@api/role/types'
-import { onMounted, ref, reactive } from 'vue'
+import { ref, reactive, onActivated } from 'vue'
 import { ElCheckbox } from 'element-plus'
 
 import type { FunctionalComponent } from 'vue'
@@ -11,9 +11,11 @@ import { useRoute, useRouter } from 'vue-router'
 import { getUserCheckedApi, postUserGrantRoleApi } from '@api/user'
 import { useTabsStore } from '@store/tabsStore'
 import { UserGrantRolePayloadType } from '@api/user/types'
+import { onDeactivated } from 'vue'
 
 const route = useRoute()
-
+// const userStore = useUserStore()
+// const { assignUserId } = storeToRefs(userStore)
 type SelectionCellProps = {
   value: boolean
   intermediate?: boolean
@@ -49,10 +51,10 @@ const columns: Column<unknown>[] = [
     headerCellRenderer: () => {
       const onChange = (value: CheckboxValueType) => {
         if (!value) return checkMap.clear()
-        tableData.forEach((item) => checkMap.set(item.id, query.userId))
+        tableData.value.forEach((item) => checkMap.set(item.id, query.userId))
       }
       // 全选样式
-      const allSelected = Boolean(checkMap.size) && checkMap.size === tableData.length
+      const allSelected = Boolean(checkMap.size) && checkMap.size === tableData.value.length
       // 选中但未全选样式
       const containsChecked = checkMap.size > 0
 
@@ -116,29 +118,20 @@ const handleSubmit = async () => {
   loading.value = false
 }
 
-const tableData = reactive<RoleType[]>([])
+const tableData = ref<RoleType[]>([])
 // const tableData1 = []
 
 // 虚拟列表  高度自适应
-const height = ref()
-const width = ref()
+// const height = ref()
+// const width = ref()
 const checkMap = reactive(new Map())
-
-// 基本信息
-type Query = { userId: string; userName: string; realName: string }
-const query = route.query as Query
 
 const formData = reactive({
   realName: '',
   userName: ''
 })
-onMounted(async () => {
-  // 内容区域
-  // 提前  防止获取不到高度 empty 不居中
-  const tableBody = document.querySelector('.el-table-v2__root')
-  height.value = tableBody!.getBoundingClientRect().height
-  width.value = tableBody!.getBoundingClientRect().width
 
+const getTableData = async () => {
   // 获取选中角色  全部角色
   const res = await getUserCheckedApi(query.userId)
 
@@ -150,15 +143,71 @@ onMounted(async () => {
   // 当前用户选中的角色
   checkedRoleIds.forEach((item) => checkMap.set(item, query.userId))
 
-  Object.assign(tableData, roles)
+  tableData.value = roles
+}
+
+// 基本信息
+type Query = { userId: string; userName: string; realName: string }
+const query = reactive<Query>({ userId: '', userName: '', realName: '' })
+
+onActivated(async () => {
+  const routeQuery = route.query as Query
+
+  query.userId = routeQuery.userId
+  query.userName = routeQuery.userName
+  query.realName = routeQuery.realName
+
+  console.log(routeQuery, 'in')
+
+  if (query.userId) {
+    localStorage.setItem('user-assign', JSON.stringify(query))
+    console.log('set => ', query)
+  }
+
+  if (!query.userId) {
+    const localUserAssign = localStorage.getItem('user-assign')
+    Object.assign(query, localUserAssign ? JSON.parse(localUserAssign) : {})
+    console.log('get => ', query)
+  }
+
+  getTableData()
+  console.log(checkMap)
 })
 
+onDeactivated(() => {
+  checkMap.clear()
+})
+// onMounted(async () => {
+//   // 内容区域
+//   // 提前  防止获取不到高度 empty 不居中
+//   // const tableBody = document.querySelector('.el-table-v2__root')
+//   // height.value = tableBody!.getBoundingClientRect().height
+//   // width.value = tableBody!.getBoundingClientRect().width
+
+//   if (!query.userId) return
+
+//   console.log(query, '===moun')
+
+//   // 获取选中角色  全部角色
+//   const res = await getUserCheckedApi(query.userId)
+
+//   Object.assign(formData, query)
+
+//   if (res.code != '200') return
+//   const { checkedRoleIds, roles } = res.data
+
+//   // 当前用户选中的角色
+//   checkedRoleIds.forEach((item) => checkMap.set(item, assignUserId.value))
+
+//   tableData.value = roles
+// })
+
 // 窗口大小改变 适应虚拟列表内容区
-window.onresize = () => {
-  const tableBody = document.querySelector('.el-table-v2__root')
-  height.value = tableBody!.getBoundingClientRect().height
-  width.value = tableBody!.getBoundingClientRect().width
-}
+// window.onresize = () => {
+//   const tableBody = document.querySelector('.el-table-v2__root')
+//   height.value = tableBody!.getBoundingClientRect().height
+//   width.value = tableBody!.getBoundingClientRect().width
+// }
 </script>
 <template>
   <div class="user-assign-role h-full flex flex-col">
@@ -192,14 +241,18 @@ window.onresize = () => {
         </div>
       </template>
       <div class="table w-full h-full">
-        <el-table-v2
-          :columns="columns"
-          :data="tableData"
-          class="!h-full !w-full"
-          :width="+width"
-          :height="+height"
-          fixed
-        />
+        <el-auto-resizer>
+          <template #default="{ height, width }">
+            <el-table-v2
+              :columns="columns"
+              :data="tableData"
+              class="!h-full !w-full"
+              :width="width"
+              :height="height"
+              fixed
+            />
+          </template>
+        </el-auto-resizer>
       </div>
     </el-card>
   </div>
