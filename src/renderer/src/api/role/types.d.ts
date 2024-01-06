@@ -1,4 +1,13 @@
-import { PageDataType, ResType } from '@api/types'
+import {
+  BaseRecord,
+  BaseResponse,
+  PageDataType,
+  ResType,
+  Cache,
+  Visible,
+  MenuType,
+  Enabled
+} from '@api/types'
 import { UserType } from '@api/user/types'
 
 // 角色列表
@@ -65,6 +74,36 @@ interface RoleTreeType extends TreeType {
 
 export interface GetRoleTreeResType extends ResType {
   data: RoleTreeType[]
+}
+
+// 角色分配  菜单权限
+
+type BasePayload = ['current', 'size', 'enabled']
+type BasePayloadNumber = Record<BasePayload[number], number>
+type MenuAttr = ['name', 'parentId', 'path', 'component', 'cache', 'type', 'visibleperms']
+type MenuAttrString = Record<MenuAttr[number], string>
+type MenuPagePayloadType = Partial<MenuAttrString> &
+  Omit<BasePayloadNumber, 'enabled'> &
+  Partial<Pick<BasePayloadNumber, 'enabled'>>
+
+interface RecordsItem extends BaseRecord {
+  sort: number //排序
+  cache: Cache //是否缓存（0：缓存；1：不缓存）
+  type: MenuType //菜单类型（0：目录；1：菜单；2：按钮）
+  visible: Visible //显示状态（0：显示；1：隐藏）
+  enabled: Enabled //菜单状态（0：禁用；1：启用）
+  query: null //路由参数
+  redirect: string //重定向
+  parentId: string //上级ID
+  path: string //路由地址
+  component: string //组件路径
+  perms: string //权限标识
+  icon: string //图标
+  children?: RecordsItem[]
+}
+
+interface MenuPageResType extends ResType {
+  data: { records: RecordsItem[] } & BaseResponse['data']
 }
 
 export interface PostAddRoleRayloadType {

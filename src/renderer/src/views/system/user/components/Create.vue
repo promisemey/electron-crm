@@ -148,7 +148,7 @@ onBeforeMount(async () => {
         unitTreePage.value = unitTree.value.data
       }
 
-      localStorage.setItem('userFields', JSON.stringify([allRole, allPost, unitTree]))
+      // localStorage.setItem('userFields', JSON.stringify([allRole, allPost, unitTree]))
     }
   )
 })

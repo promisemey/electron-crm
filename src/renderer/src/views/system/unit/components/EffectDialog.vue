@@ -42,34 +42,32 @@ const formRules = reactive<FormRules<AddUnitPayloadType>>({
   ]
 })
 
+// 获取机构数据
 const unitData = ref<UnitTreeType[]>([])
-
 const getUnitData = async () => {
-  // const res = await getUnitTreeApi(formData)
   const res = await getUnitTreeApi()
-
-  console.log(res.data, '-----------')
 
   if (res.code == '200') {
     const result = useResetForm<UnitTreeType>(res.data[0], { returnResult: true, copy: true })
 
-    unitData.value = [...res.data, { ...result, id: '-1', name: '新一级', parentId: '-1' }]
-
-    console.log(unitData.value, '====')
+    // 创建一级机构
+    unitData.value = [...res.data, { ...result, id: '-1', name: '新一级', system: 1 }]
   }
 }
 
 const peopleRef = ref()
 
+// 弹出选择领导 dialog
 const handleSelectLeader = () => {
   peopleRef.value.peopleVisible = true
 }
 
+// 设置领导
 const handlAcceptLeader = (row) => {
-  console.log('row=>', row)
   formData.leaderId = row.username
 }
 
+// 提交
 const handleSubmit = (formEl: FormInstance | undefined) => {
   if (!formEl) return
   formEl.validate(async (valid) => {
@@ -86,9 +84,7 @@ const handleSubmit = (formEl: FormInstance | undefined) => {
       }
 
       if (res.code == '200') {
-        Promise.allSettled([props.refresh(), getUnitData()]).then((res) => {
-          console.log(res, '----0')
-        })
+        Promise.allSettled([props.refresh(), getUnitData()])
       }
       visible.value = false
       return formEl.resetFields()
@@ -99,6 +95,7 @@ const handleSubmit = (formEl: FormInstance | undefined) => {
   })
 }
 
+// 重置数据
 const handleReset = (formEl: FormInstance | undefined) => {
   if (!formEl) return
   visible.value = false
@@ -123,7 +120,7 @@ onBeforeMount(() => {
 })
 
 const onBeforeClose = () => {
-  // Object.keys(formData).forEach((item) => (formData[item] = ''))
+  // 关闭前清空数据
   useResetForm(formData)
   visible.value = false
 }

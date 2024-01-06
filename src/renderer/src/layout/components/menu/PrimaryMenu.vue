@@ -1,12 +1,14 @@
 <script lang="ts" setup>
-import { onBeforeMount } from 'vue'
+import { onMounted } from 'vue'
 import { useMenuStore } from '@store/menuStore'
 import { useRoute } from 'vue-router'
 import { useSelectMenu } from '@hooks/useSelectMenu'
 import { Meta } from '@api/common/types'
+import { storeToRefs } from 'pinia'
 
 // 菜单数据
 const menuStore = useMenuStore()
+const { dyRoutes } = storeToRefs(menuStore)
 const route = useRoute()
 
 // 查找二级菜单
@@ -39,7 +41,7 @@ const onClickMenu = (active) => {
 //   }
 // }
 
-onBeforeMount(() => {
+onMounted(() => {
   // const res = route.fullPath.split('/')[1].replace('', '/')
 
   const parentMenu: string = route.meta.parent as string
@@ -50,7 +52,7 @@ onBeforeMount(() => {
   if (route.fullPath == '/dashboard') menuStore.defaultActive = '/home'
 
   // 二级菜单 初始数据
-  const parent = menuStore.dyRoutes.find((item) => item.path === parentMenu)
+  const parent = dyRoutes.value.find((item) => item.path === parentMenu)
 
   if (parent?.children) {
     menuStore.childMenu = parent?.children
@@ -60,7 +62,7 @@ onBeforeMount(() => {
   menuStore.childDefaultActive = route.fullPath
 
   // 一级菜单 标题
-  menuStore.currentMenu = (route.meta.breadCrumbs as Meta).title
+  menuStore.currentMenu = (route.meta.breadCrumbs as Meta)?.title || ''
 })
 </script>
 <template>
@@ -71,7 +73,7 @@ onBeforeMount(() => {
       :collapse="true"
       router
     >
-      <template v-for="menu in menuStore.dyRoutes" :key="menu.id">
+      <template v-for="menu in dyRoutes" :key="menu.id">
         <el-menu-item v-if="menu.meta.title !== '小鹿线'" :index="menu.path" @click="onClickMenu">
           <el-icon class="m-0">
             <component :is="menu.meta.icon.replace('el-icon-', '')"></component>

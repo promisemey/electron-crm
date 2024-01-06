@@ -1,5 +1,5 @@
 import { RoleType } from '@api/role/types'
-import { ResType } from '@api/types'
+import { BaseResponse, ResType } from '@api/types'
 
 type UserAttr = ['username', 'realName', 'email', 'phone', 'gender', 'enabled', 'unitId']
 type UserPage = Record<UserAttr[number], string>

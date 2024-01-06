@@ -8,6 +8,8 @@ import {
   GetRolePayloadyType,
   GetRoleResType,
   GetRoleTreeResType,
+  MenuPagePayloadType,
+  MenuPageResType,
   PostAddRoleRayloadType,
   PostAddRoleResType,
   PostUpdateRolePayloadType,
@@ -24,6 +26,10 @@ export const getAllRoleApi = () => {
 
 export const getRoleTreeApi = () => {
   return request.get<GetRoleTreeResType>('/system/menu/tree')
+}
+
+export const getRoleNenuAuthApi = (params: MenuPagePayloadType) => {
+  return request.get<MenuPageResType>('/system/menu/page', params)
 }
 
 export const postAddRoleApi = (params: PostAddRoleRayloadType) => {

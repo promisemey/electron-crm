@@ -24,7 +24,7 @@ export const DelUnitApi = (id: number) => {
   return request.get<ResType>(`/system/unit/delete/${id}`)
 }
 
-// 删除机构
+// 修改机构
 export const UpdateUnitApi = (params: AddUnitPayloadType) => {
   return request.post<ResType>(`/system/unit/update`, params)
 }

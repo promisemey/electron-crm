@@ -86,21 +86,28 @@ const handleAssignRole = (row: UserType) => {
 }
 
 const getUserData = async (unitId = { unitId: '' }) => {
+  // if (!pagination.pages) return
+
   const res = await getUserPageApi({ ...formData, ...unitId })
 
   if (res.code == '200') {
-    const { records, ...other } = res.data
+    const { records, pages } = res.data
 
     tableData.value = records
-    Object.assign(pagination, other)
+    pagination.pages = pages ? pages : 1
   }
 }
 
 // 分页
-const pagination = reactive<Partial<PageDataType>>({})
+const pagination = reactive<Partial<PageDataType>>({
+  current: 1,
+  size: 10,
+  pages: 1
+})
 
 const onSizeChange = (pagesize: number) => {
   formData.size = pagesize
+
   getUserData()
 }
 const onCurrentChange = (current: number) => {

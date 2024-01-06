@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { ref, reactive, onBeforeMount } from 'vue'
-import { deleteUserApi } from '@api/user/index'
 import { UserType } from '@api/user/types'
 import { useDictStore } from '@store/dictStore'
 import { Dictionary } from '@api/dictionary/types'
@@ -77,7 +76,7 @@ onBeforeMount(async () => {
 
 import { useConfirm } from '@hooks/useConfirm'
 import { GetUnitPayloadType, UnitType } from '@api/unit/types'
-import { getUnitPageApi, getUnitTreeApi } from '@api/unit'
+import { DelUnitApi, getUnitPageApi, getUnitTreeApi } from '@api/unit'
 import { TableColumnCtx } from 'element-plus'
 import { useResetForm } from '@hooks/useResetForm'
 
@@ -108,7 +107,7 @@ const handleEdit = (row: UserType) => {
 }
 // 删除
 const handleDel = (row: UnitType) => {
-  useConfirm(row.id, deleteUserApi, getTableData)
+  useConfirm(row.id, DelUnitApi, getTableData)
 }
 /** ------- 操作 -------  */
 

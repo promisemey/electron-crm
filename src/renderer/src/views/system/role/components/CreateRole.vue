@@ -1,7 +1,8 @@
+<!-- eslint-disable @typescript-eslint/no-non-null-assertion -->
 <script lang="ts" setup>
 import { Dictionary } from '@api/dictionary/types'
-import { getRoleDetailApi, getRoleTreeApi, postAddRoleApi, postUpdateRolelApi } from '@api/role'
-import { RoleTreeType } from '@api/role/types'
+import { getRoleDetailApi, getRoleNenuAuthApi, postAddRoleApi, postUpdateRolelApi } from '@api/role'
+import { RecordsItem } from '@api/role/types'
 import { useMainStore } from '@store'
 import { ElTree } from 'element-plus'
 import { storeToRefs } from 'pinia'
@@ -27,7 +28,7 @@ const init: InitType = {
 const formData = reactive(init)
 
 const propsTree = { label: 'name' }
-const tree = ref<RoleTreeType[]>([])
+const menuTreeAuth = ref<RecordsItem[]>([])
 const treeRef = ref<InstanceType<typeof ElTree>>()
 // 展开
 const treeExpand = ref<boolean>(false)
@@ -57,8 +58,45 @@ const handleLinkage = (val: boolean) => {
 }
 
 onMounted(async () => {
-  const res = await getRoleTreeApi()
-  tree.value = res.data
+  const res = await getRoleNenuAuthApi({ current: 1, size: 999 })
+
+  // const map = new Map(res.data.records.map((item) => [item.id, item]))
+
+  // const result: RecordsItem[] = []
+  // res.data.records.forEach((item: RecordsItem) => {
+  //   if (item.parentId == '-1') return result.push(item)
+  // })
+
+  type FlatMenu = (data: RecordsItem[]) => RecordsItem[]
+
+  const flatMenu: FlatMenu = (data) => {
+    const map = new Map(data.map((item) => [item.id, item]))
+
+    return data.reduce((acc: RecordsItem[], item) => {
+      if (item.parentId === '-1') {
+        acc.push(item)
+      } else {
+        const parent = map.get(item.parentId)
+        parent && parent.children?.push(item)
+      }
+
+      return acc
+    }, [])
+  }
+
+  // const result = res.data.records.reduce((acc: Map<string, RecordsItem[]>, cur: RecordsItem) => {
+  //   if (!acc.has(cur.parentId)) {
+  //     acc.set(cur.parentId, [cur])
+  //   } else {
+  //     acc.get(cur.parentId)?.push(cur)
+  //   }
+
+  //   return acc
+  // }, map)
+
+  // res.data.records.forEach()
+
+  menuTreeAuth.value = flatMenu(res.data.records)
 })
 
 const handleSubmit = async () => {
@@ -157,7 +195,7 @@ defineExpose({
               <el-tree
                 ref="treeRef"
                 :props="propsTree"
-                :data="tree"
+                :data="menuTreeAuth"
                 show-checkbox
                 node-key="id"
                 highlight-current

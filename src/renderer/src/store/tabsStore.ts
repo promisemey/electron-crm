@@ -59,11 +59,17 @@ export const useTabsStore = defineStore('tabsStore', () => {
     }, 10)
   }
 
+  const reset = () => {
+    editableTabsValue.value = ''
+    editableTabs.value = [initTabs]
+  }
+
   return {
     editableTabsValue,
     editableTabs,
     tabFlag,
     addTab,
-    removeTab
+    removeTab,
+    reset
   }
 })

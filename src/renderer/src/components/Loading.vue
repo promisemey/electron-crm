@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref } from 'vue'
 import { LottieAnimation } from 'lottie-web-vue'
 import WaterLoader from '@assets/lotties/WaterLoader.json'
 import { useMainStore } from '@store'
@@ -13,11 +13,10 @@ const mainStore = useMainStore()
 const { loading } = storeToRefs(mainStore)
 // loading 实例
 const anim = ref()
-watch(loading, () => {
-  if (!loading.value) {
-    console.log(anim.value)
-  }
-})
+// watch(loading, () => {
+//   if (!loading.value) {
+//   }
+// })
 
 // // called after each loop
 // const loopComplete = () => {

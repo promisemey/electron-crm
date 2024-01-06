@@ -31,6 +31,7 @@ withDefaults(
       :current-page="+current"
       :page-size="+size"
       background
+      hide-on-single-page
       layout="sizes, prev, pager, next, jumper"
       :page-count="+count"
       @size-change="onSizeChange"

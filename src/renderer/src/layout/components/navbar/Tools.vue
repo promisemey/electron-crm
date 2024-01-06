@@ -1,11 +1,10 @@
 <script lang="ts" setup>
+import { useResetPinia } from '@hooks/useResetPinia'
 import { useUserStore } from '@store/userStore'
 import { ElMessageBox } from 'element-plus'
-import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 
 const userStore = useUserStore()
-const { userInfo } = storeToRefs(userStore)
 
 const router = useRouter()
 // 退出登录
@@ -20,12 +19,16 @@ const onExit = () => {
         type: 'success',
         message: '退出成功'
       })
-      // 清空本地存储
-      localStorage.removeItem('token')
+
       router.replace('/login')
+      // 清空本地存储
+      useResetPinia()
       window.electron.ipcRenderer.invoke('user-logout')
     })
-    .catch(() => {
+    .catch((e) => {
+      console.log(e)
+      useResetPinia()
+
       ElMessage({
         type: 'info',
         message: '取消退出'
@@ -48,7 +51,7 @@ const onClose = () => {
   <div class="tools flex items-center gap-5">
     <el-dropdown>
       <span class="flex items-center gap-2 overflow-hidden">
-        <img :src="userInfo.avatar" class="w-8 rounded-full" alt="" />
+        <img :src="userStore.userInfo?.avatar ?? ''" class="w-8 rounded-full" alt="" />
         <el-icon>
           <arrow-down />
         </el-icon>

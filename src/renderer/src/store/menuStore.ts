@@ -4,12 +4,13 @@ import { useUserStore } from './userStore'
 import { reactive, ref } from 'vue'
 import { ComponentViews, MenuStore, ResetMenu, RoutesItem } from '@types'
 import router from '@router'
+import { Menu } from '@api/common/types'
 // import { RouteRecordRaw } from 'vue-router'
 
 export const useMenuStore = defineStore('menuStore', () => {
   const localMenu = localStorage.getItem('menu_info')
 
-  const menu_info = reactive<MenuStore[]>(localMenu ? JSON.parse(localMenu) : [])
+  const menu_info = ref<Menu[]>(localMenu ? JSON.parse(localMenu) : [])
 
   // 二级菜单
   const childMenu = reactive<RoutesItem[]>([])
@@ -21,8 +22,8 @@ export const useMenuStore = defineStore('menuStore', () => {
   const isCollapse = ref<boolean>(true)
 
   // 本地路由信息
-  const localRoutes = localStorage.getItem('mapRoutes')
-  const dyRoutes = reactive<RoutesItem[]>(localRoutes ? JSON.parse(localRoutes) : [])
+  // const localRoutes = localStorage.getItem('mapRoutes')
+  const dyRoutes = ref<RoutesItem[]>([])
 
   const views = (component): ComponentViews => {
     if (!component) return
@@ -74,24 +75,28 @@ export const useMenuStore = defineStore('menuStore', () => {
   // 获取路由信息
   const getMenuInfo = async () => {
     // 本地无数据
-    if (!dyRoutes.length) {
+    if (!dyRoutes.value.length) {
       const res = useUserStore()
       const { rolePerm } = storeToRefs(res)
 
-      const menuInfo = await getMenuInfoApi(rolePerm.value)
-      if (menuInfo.code == 200) {
-        localStorage.setItem('menu_info', JSON.stringify(menuInfo.data))
-        setDyRoutes(menuInfo.data)
+      if (rolePerm.value) {
+        const menuInfo = await getMenuInfoApi(rolePerm.value)
+
+        if (menuInfo.code == 200) {
+          menu_info.value = menuInfo.data
+          localStorage.setItem('menu_info', JSON.stringify(menu_info.value))
+          setDyRoutes(menu_info.value)
+        }
       }
     } else {
-      setDyRoutes(menu_info)
+      setDyRoutes(menu_info.value)
     }
   }
 
   // 添加route
   const setDyRoutes = (menuData) => {
     const mapRoutes = addRouteDy(menuData)
-    Object.assign(dyRoutes, mapRoutes)
+    dyRoutes.value = mapRoutes
     localStorage.setItem('mapRoutes', JSON.stringify(mapRoutes))
 
     const setRoutes = (routeMenu) => {
@@ -104,15 +109,21 @@ export const useMenuStore = defineStore('menuStore', () => {
     setRoutes(mapRoutes)
   }
 
-  // dyRoutes.forEach((item) => router.addRoute(item.parentView ?? item.name, item))
+  const reset = () => {
+    menu_info.value = []
+    currentMenu.value = ''
+    dyRoutes.value = []
+  }
 
   return {
     dyRoutes,
+    menu_info,
     childMenu,
     defaultActive,
     childDefaultActive,
     isCollapse,
     currentMenu,
-    getMenuInfo
+    getMenuInfo,
+    reset
   }
 })
