@@ -1,18 +1,39 @@
-import { PageDataType, ResType } from '@api/types'
+import { BaseResponse, BaseRecord, PageDataType, ResType } from '@api/types'
 
-export interface PostType {
-  id: string //岗位ID
-  postName: string //岗位名称
-  postCode: string //岗位编码
+export type PostType = {
+  id: string
   sort: number //排序
-  enabled: number //是否启用（1：启用；0：禁用）
-  remark?: string //备注
-  createBy?: string
-  createTime?: string
-  updateBy?: string
-  updateTime?: string
-}
+  postName: string
+  postCode: string
+  enabled: number
+} & Omit<BaseRecord, 'name'>
 
 export interface GetAllPostResType extends ResType {
   data: PostType[]
+}
+
+export interface GetPostPagePayloadType {
+  current: number
+  size: number
+  postName?: string
+  postCode?: string
+  enabled?: string
+}
+
+export interface PostPageResType extends ResType {
+  data: {
+    records: PostType[]
+  } & BaseResponse['data']
+}
+
+export interface PostPayloadType {
+  remark: string
+  sort: number | string //排序
+  postName: string
+  postCode: string
+  enabled: number | string
+}
+
+export interface UpdatePostPayloadType extends PostPayloadType {
+  id: string
 }

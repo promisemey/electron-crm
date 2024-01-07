@@ -74,7 +74,6 @@ onBeforeMount(async () => {
 
 // 新增用户
 
-import { useConfirm } from '@hooks/useConfirm'
 import { GetUnitPayloadType, UnitType } from '@api/unit/types'
 import { DelUnitApi, getUnitPageApi, getUnitTreeApi } from '@api/unit'
 import { TableColumnCtx } from 'element-plus'
@@ -107,7 +106,7 @@ const handleEdit = (row: UserType) => {
 }
 // 删除
 const handleDel = (row: UnitType) => {
-  useConfirm(row.id, DelUnitApi, getTableData)
+  row.id, DelUnitApi, getTableData
 }
 /** ------- 操作 -------  */
 
