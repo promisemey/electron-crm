@@ -1,11 +1,10 @@
 import router from '@router'
 import { useMenuStore } from '@store/menuStore'
-import { useRoute } from 'vue-router'
 
 // 全局前置导航守卫
 router.beforeEach(async (to, _from, next) => {
   const white = ['/login']
-  const token = localStorage.getItem('token')
+  const token = localStorage.getItem('TOKEN')
   const menuStore = useMenuStore()
   const { getMenuInfo } = menuStore
 

@@ -4,9 +4,9 @@ import type { AxiosInstance, AxiosRequestConfig, AxiosError, AxiosResponse } fro
 import axios from 'axios' // pnpm add axios
 
 // 创建axios实例
-const request: AxiosInstance = axios.create({
+export const request: AxiosInstance = axios.create({
   baseURL: '/api',
-  timeout: 6000,
+  timeout: 1000 * 30,
   headers: {
     // 'content-type': 'application/x-www-form-urlencoded'
   }
@@ -17,7 +17,8 @@ request.interceptors.request.use(
   (config) => {
     const mainStore = useMainStore()
     mainStore.loading = true
-    const token = localStorage.getItem('token')
+
+    const token = localStorage.getItem('TOKEN')
     if (token) {
       config.headers.Authorization = token
     }
@@ -38,8 +39,8 @@ request.interceptors.response.use(
     return response.data
   },
   (error: AxiosError) => {
-    // const mainStore = useMainStore()
-    // mainStore.loading = false
+    const mainStore = useMainStore()
+    mainStore.loading = false
     return Promise.reject(error)
   }
 )

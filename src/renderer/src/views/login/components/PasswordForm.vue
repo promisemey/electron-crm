@@ -45,11 +45,10 @@ const getCaptcha = async () => {
 const postlogin = async () => {
   const account = { username: Encrypt(ruleForm.username), password: Encrypt(ruleForm.password) }
 
-  const res = await postUserLoginApi({
-    ...ruleForm,
-    ...account
-  })
-  isLoding.value = false
+  // const res = await postUserLoginApi({
+  //   ...ruleForm,
+  //   ...account
+  // })
 
   // 记住密码
   if (isRemember.value) {
@@ -58,7 +57,10 @@ const postlogin = async () => {
     localStorage.removeItem('reme_tut')
   }
 
-  useLogin(res)
+  useLogin<PostUserPayloadType>(postUserLoginApi, {
+    ...ruleForm,
+    ...account
+  })
 }
 
 const onChangeCaptCha = () => {
@@ -68,11 +70,11 @@ const onChangeCaptCha = () => {
 // 登录
 const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
-  await formEl.validate((valid, fields) => {
+  await formEl.validate(async (valid, fields) => {
     if (valid) {
       isLoding.value = true
-      postlogin()
-      console.log('submit!')
+      await postlogin()
+      isLoding.value = false
     } else {
       console.log('error submit!', fields)
     }

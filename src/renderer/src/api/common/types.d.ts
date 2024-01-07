@@ -14,6 +14,7 @@ export interface PostUserResType {
   data: string
   msg: string
 }
+export interface UserLoginResType extends PostUserResType {}
 
 export interface GetDyCaptchaPayloadType {
   mobile: string // AES

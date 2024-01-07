@@ -1,21 +1,30 @@
 import { useMenuStore } from '@store/menuStore'
 import { useUserStore } from '@store/userStore'
 import router from '@router'
+import { PostPhoneResType, PostUserResType } from '@api/common/types'
+import { AxiosError } from 'axios'
 
-export const useLogin = async (res) => {
-  //   const router = useRouter()
-  if (res.code != 200) return ElMessage.error(res.msg)
+export const useLogin = async <T>(
+  loginFn: (params: T) => Promise<PostUserResType | PostPhoneResType>,
+  params: T
+) => {
+  try {
+    const login = await loginFn(params)
+    if (login.code != '200') return
+    localStorage.setItem('TOKEN', login.data)
+    await useUserStore().getUserInfo()
+    await useMenuStore().getMenuInfo()
+    router.push('/')
+  } catch (e) {
+    const error = e as AxiosError
 
-  const token = res.data
+    console.log('err')
 
-  // 持久化存储
-  localStorage.setItem('token', token || '')
+    const reme_tut = localStorage.getItem('reme_tut')
+    localStorage.clear()
 
-  // 获取用户信息
-  await useUserStore().getUserInfo()
-  // 获取菜单数据
-  await useMenuStore().getMenuInfo()
+    ElMessage.error((error.response?.data as any).msg || error.message)
 
-  router.push('/')
-  return
+    reme_tut && localStorage.setItem('reme_tut', reme_tut)
+  }
 }

@@ -69,12 +69,15 @@ const onGetDyCaptcha = async () => {
 
 // 验证码登录
 const postCaptchaLogin = async () => {
-  const res = await postPhoneLoginApi({
+  // const res = await postPhoneLoginApi({
+  //   mobile: Encrypt(ruleForm.mobile),
+  //   captcha: Encrypt(ruleForm.captcha)
+  // })
+
+  useLogin<PostPhonePayloadType>(postPhoneLoginApi, {
     mobile: Encrypt(ruleForm.mobile),
     captcha: Encrypt(ruleForm.captcha)
   })
-
-  useLogin(res)
 }
 
 // 登录

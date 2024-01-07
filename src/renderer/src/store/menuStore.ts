@@ -2,10 +2,9 @@ import { getMenuInfoApi } from '@api/common'
 import { defineStore, storeToRefs } from 'pinia'
 import { useUserStore } from './userStore'
 import { reactive, ref } from 'vue'
-import { ComponentViews, MenuStore, ResetMenu, RoutesItem } from '@types'
+import { ComponentViews, ResetMenu, RoutesItem } from '@types'
 import router from '@router'
 import { Menu } from '@api/common/types'
-import { RecordsItem } from '@api/role/types'
 // import { RouteRecordRaw } from 'vue-router'
 
 export const useMenuStore = defineStore(
@@ -88,14 +87,10 @@ export const useMenuStore = defineStore(
 
           if (menuInfo.code == 200) {
             menu_info.value = menuInfo.data.filter((item) => !item.path.includes('//'))
-
-            // localStorage.setItem('menu_info', JSON.stringify(menu_info.value))
-            setDyRoutes(menu_info.value)
           }
         }
-      } else {
-        setDyRoutes(menu_info.value)
       }
+      setDyRoutes(menu_info.value)
     }
 
     // 添加route
@@ -112,6 +107,7 @@ export const useMenuStore = defineStore(
       }
 
       setRoutes(mapRoutes)
+      return true
     }
 
     const reset = () => {

@@ -11,10 +11,8 @@ export const useResetPinia = () => {
   userStore.reset()
   tabsStore.reset()
 
-  localStorage.removeItem('token')
-  localStorage.removeItem('userInfo')
-  localStorage.removeItem('role')
-  localStorage.removeItem('rolePerm')
-  localStorage.removeItem('menu_info')
-  localStorage.removeItem('mapRoutes')
+  const reme_tut = localStorage.getItem('reme_tut')
+  localStorage.clear()
+
+  reme_tut && localStorage.setItem('reme_tut', reme_tut)
 }

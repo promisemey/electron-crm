@@ -1,5 +1,6 @@
 import { getUserInfoApi } from '@api/common'
 import { Role, UserInfo } from '@api/common/types'
+import { useResetForm } from '@hooks/useResetForm'
 import { defineStore } from 'pinia'
 import { reactive, ref } from 'vue'
 // 你可以对 `defineStore()` 的返回值进行任意命名，但最好使用 store 的名字，同时以 `use` 开头且以 `Store` 结尾。(比如 `useUserStore`，`useCartStore`，`useProductStore`)
@@ -23,7 +24,7 @@ export const useUserStore = defineStore(
     // 获取用户数据
     const getUserInfo = async () => {
       const res = await getUserInfoApi()
-      console.log(res, '====login')
+      // console.log(res, '====login')
 
       if (res.code == 200) {
         const {
@@ -31,21 +32,20 @@ export const useUserStore = defineStore(
           // data: { userInfo: info, roles, wechat, permissions, units }
         } = res
 
-        console.log(res, '====login')
+        // console.log(res, '====login')
 
         Object.assign(userInfo, info)
         role.value = roles
         rolePerm.value = role.value[0].rolePerm
-
-        // localStorage.setItem('userInfo', JSON.stringify(userInfo))
-        // localStorage.setItem('role', JSON.stringify(role.value))
-        // localStorage.setItem('rolePerm', rolePerm.value)
       }
+
+      return res
     }
 
     const reset = () => {
       role.value = []
       rolePerm.value = ''
+      useResetForm(userInfo)
     }
 
     return {

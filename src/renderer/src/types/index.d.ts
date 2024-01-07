@@ -22,9 +22,28 @@ interface ResetMenu extends OmitMenuType {
 //   breadCrumbs: Meta[]
 // }
 
+interface Menu {
+  id: string //ID
+  name: string //路由名称
+  hidden?: boolean //显示状态
+  redirect: string //重写向地址
+  component: any //组件路径
+  alwaysShow?: boolean //是否总显示
+  query?: string //路由参数
+  path: string //路由地址
+  meta: Meta
+  parentView: string
+  children: Children[]
+}
+
 interface RoutesItem extends OmitMenuType {
+  id: string //ID
+  hidden?: boolean //显示状态
+  alwaysShow?: boolean //是否总显示
+  query?: string //路由参数
   children?: ChildItem[]
-  meta: MetaType
+  meta: MetaType | Meta
+  [k: string]: any
 }
 
 // route meta类型扩展
