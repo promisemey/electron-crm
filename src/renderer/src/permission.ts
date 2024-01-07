@@ -19,7 +19,6 @@ router.beforeEach(async (to, _from, next) => {
     // 加载动态路由
     await getMenuInfo()
 
-    // console.log(router.getRoutes())
     if (!to.redirectedFrom) {
       next({ ...to, replace: true })
     } else {

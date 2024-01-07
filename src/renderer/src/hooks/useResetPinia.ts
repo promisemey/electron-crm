@@ -12,7 +12,9 @@ export const useResetPinia = () => {
   tabsStore.reset()
 
   const reme_tut = localStorage.getItem('reme_tut')
+  const isRemember = localStorage.getItem('isRemember')
   localStorage.clear()
 
+  isRemember && localStorage.setItem('isRemember', isRemember)
   reme_tut && localStorage.setItem('reme_tut', reme_tut)
 }

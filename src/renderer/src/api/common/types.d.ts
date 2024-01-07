@@ -1,3 +1,5 @@
+import { ResType } from '@api/types'
+
 export interface GetCaptchaPayloadType {
   key: string
 }
@@ -111,7 +113,6 @@ interface GetUserInfoResType extends PostUserResType {
 }
 
 // 路由
-
 interface Meta {
   title: string //标题
   icon: string //图标
@@ -133,11 +134,46 @@ interface Menu {
   alwaysShow?: boolean //是否总显示
   query?: string //路由参数
   path: string //路由地址
-  meta: Meta
   parentView: string
+  meta: Meta
   children: Children[]
 }
 
 export interface GetMenuResType extends PostUserResType {
   data: Menu[]
+}
+
+// 重构Router
+
+// meta
+export interface RouteMetaBasicType {
+  affix: boolean
+  hidden: boolean
+  title: string //标题
+  icon: string //图标
+  link: null | string //外链
+  noCache: boolean //是否缓存
+}
+
+export interface RouteMetaType extends RouteMetaBasicType {
+  breadCrumbs?: RouteMetaBasicType
+}
+
+// Route基础属性
+export interface RouterItemType {
+  id: string //ID
+  name: string //路由名称
+  hidden?: boolean //显示状态
+  redirect: string //重写向地址
+  component: string | null //组件路径
+  alwaysShow?: boolean //是否总显示
+  query?: string //路由参数
+  path: string //路由地址
+  parentView: string
+  meta: RouteMetaType
+  children: RouterItemType[] | null
+}
+
+export interface RoutersResType extends ResType {
+  data: RouterItemType[]
 }

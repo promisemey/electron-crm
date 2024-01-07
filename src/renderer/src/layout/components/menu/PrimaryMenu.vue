@@ -8,7 +8,7 @@ import { storeToRefs } from 'pinia'
 
 // 菜单数据
 const menuStore = useMenuStore()
-const { dyRoutes } = storeToRefs(menuStore)
+const { dyRoutes, childMenu } = storeToRefs(menuStore)
 const route = useRoute()
 
 // 查找二级菜单
@@ -55,7 +55,7 @@ onMounted(() => {
   const parent = dyRoutes.value.find((item) => item.path === parentMenu)
 
   if (parent?.children) {
-    menuStore.childMenu = parent?.children
+    childMenu.value = parent?.children
   }
 
   // 二级默认选中

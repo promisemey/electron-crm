@@ -10,7 +10,8 @@ import {
   PostPhonePayloadType,
   PostPhoneResType,
   PostUserPayloadType,
-  PostUserResType
+  PostUserResType,
+  RoutersResType
 } from './types'
 
 /**
@@ -43,5 +44,5 @@ export const getUserInfoApi = () => {
 
 // 路由信息
 export const getMenuInfoApi = (rolePerm: string) => {
-  return request.get<GetMenuResType>(`/personal/getRouters/${rolePerm}`)
+  return request.get<RoutersResType>(`/personal/getRouters/${rolePerm}`)
 }
