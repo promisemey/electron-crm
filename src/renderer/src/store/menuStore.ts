@@ -49,30 +49,33 @@ export const useMenuStore = defineStore(
       // 原始菜单
       if (menu.length && routes.length) return []
 
-      return menu.reduce((acc: RouterItemType[], cur: RouterItemType): RouterItemType[] => {
-        const routesItem: RouterItemType = {
-          id: cur.id,
-          path: `/${cur.path}`.replace('//', '/'),
-          name: cur.name,
-          redirect: cur.redirect,
-          parentView: cur.parentView,
-          meta: Object.assign(cur.meta, parent),
-          children: cur.children ?? [],
-          component: cur.component
-        }
-        // 父级路由
-        // if (routesItem.component) routesItem.component = views(cur.component)
-        // 子菜单 有数据
-        if (routesItem.children != null && routesItem.children?.length)
-          routesItem.children = addRouteDy(routesItem.children, [], {
-            breadCrumbs: { ...cur.meta },
-            parent: cur.path
-          })
+      return menu
+        .reduce((acc: RouterItemType[], cur: RouterItemType): RouterItemType[] => {
+          const routesItem: RouterItemType = {
+            id: cur.id,
+            path: `/${cur.path}`.replace('//', '/'),
+            name: cur.name,
+            redirect: cur.redirect,
+            parentView: cur.parentView,
+            meta: Object.assign(cur.meta, parent),
+            children: cur.children ?? [],
+            component: cur.component
+          }
+          // 父级路由
+          // if (routesItem.component) routesItem.component = views(cur.component)
+          // 子菜单 有数据
+          if (routesItem.children != null && routesItem.children?.length)
+            routesItem.children = addRouteDy(routesItem.children, [], {
+              breadCrumbs: { ...cur.meta },
+              parent: cur.path
+            })
 
-        acc.push(routesItem)
+          acc.push(routesItem)
 
-        return acc
-      }, routes)
+          return acc
+        }, routes)
+        .filter((item) => !item.component?.includes('//'))
+        .sort((a, b) => Number(BigInt(a.id) - BigInt(b.id)))
     }
 
     // 获取路由信息
@@ -89,31 +92,28 @@ export const useMenuStore = defineStore(
         if (rolePerm.value) {
           const menuInfo = await getMenuInfoApi(rolePerm.value)
 
+          console.log(menuInfo, '========')
+
           if (menuInfo.code == '200') {
-            dyRoutes.value = menuInfo.data.filter((item) => !item.path.includes('//'))
+            dyRoutes.value = addRouteDy(menuInfo.data)
           }
         }
       }
 
       if (dyRoutes.value.length) {
-        setDyRoutes(dyRoutes.value)
+        setRoutes(JSON.parse(JSON.stringify(dyRoutes.value)))
       }
     }
 
     // 添加route
-    const setDyRoutes = (menuData) => {
-      const mapRoutes = addRouteDy(menuData)
 
-      const setRoutes = (routeMenu) => {
-        routeMenu.forEach((item) => {
-          if (item.component) item.component = views(item.component)
+    const setRoutes = (routeMenu) => {
+      routeMenu.forEach((item) => {
+        if (item.component) item.component = views(item.component)
 
-          router.addRoute(item.parentView ?? 'layout', item)
-          if (item.children?.length) setRoutes(item.children)
-        })
-      }
-
-      setRoutes(mapRoutes)
+        router.addRoute(item.parentView ?? 'layout', item)
+        if (item.children?.length) setRoutes(item.children)
+      })
     }
 
     const reset = () => {

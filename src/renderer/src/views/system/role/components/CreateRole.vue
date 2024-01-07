@@ -58,14 +58,8 @@ const handleLinkage = (val: boolean) => {
 }
 
 onMounted(async () => {
+  // 获取全部角色
   const res = await getRoleNenuAuthApi({ current: 1, size: 999 })
-
-  // const map = new Map(res.data.records.map((item) => [item.id, item]))
-
-  // const result: RecordsItem[] = []
-  // res.data.records.forEach((item: RecordsItem) => {
-  //   if (item.parentId == '-1') return result.push(item)
-  // })
 
   type FlatMenu = (data: RecordsItem[]) => RecordsItem[]
 
@@ -100,6 +94,9 @@ const handleSubmit = async () => {
     console.log('创建')
   } else {
     const treeChecked = treeRef.value?.getCheckedKeys() as string[]
+
+    console.log(treeChecked)
+
     res.value = await postUpdateRolelApi({
       ...formData,
       permissionIds: treeChecked,

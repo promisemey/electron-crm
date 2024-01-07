@@ -3,10 +3,12 @@ import { useUserStore } from '@store/userStore'
 import router from '@router'
 import { PostPhoneResType, PostUserResType } from '@api/common/types'
 import { AxiosError } from 'axios'
+import { Ref } from 'vue'
 
 export const useLogin = async <T>(
   loginFn: (params: T) => Promise<PostUserResType | PostPhoneResType>,
-  params: T
+  params: T,
+  loading?: Ref<boolean>
 ): Promise<unknown> => {
   try {
     const login = await loginFn(params)
@@ -16,9 +18,11 @@ export const useLogin = async <T>(
 
     await useUserStore().getUserInfo()
     await useMenuStore().getMenuInfo()
-
     router.push('/')
-    return
+
+    console.log(loading, '---')
+
+    if (loading) loading.value = false
   } catch (e) {
     const error = e as AxiosError
 

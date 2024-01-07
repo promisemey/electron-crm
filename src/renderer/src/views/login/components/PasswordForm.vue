@@ -57,10 +57,14 @@ const postlogin = async () => {
     localStorage.removeItem('reme_tut')
   }
 
-  useLogin<PostUserPayloadType>(postUserLoginApi, {
-    ...ruleForm,
-    ...account
-  })
+  await useLogin<PostUserPayloadType>(
+    postUserLoginApi,
+    {
+      ...ruleForm,
+      ...account
+    },
+    isLoding
+  )
 }
 
 const onChangeCaptCha = () => {
@@ -74,7 +78,6 @@ const submitForm = async (formEl: FormInstance | undefined) => {
     if (valid) {
       isLoding.value = true
       await postlogin()
-      isLoding.value = false
     } else {
       console.log('error submit!', fields)
     }

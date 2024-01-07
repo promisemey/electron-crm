@@ -74,7 +74,7 @@ onMounted(() => {
       router
     >
       <template v-for="menu in dyRoutes" :key="menu.id">
-        <el-menu-item v-if="menu.meta.title !== '小鹿线'" :index="menu.path" @click="onClickMenu">
+        <el-menu-item :index="menu.path" @click="onClickMenu">
           <el-icon class="m-0">
             <component :is="menu.meta.icon.replace('el-icon-', '')"></component>
           </el-icon>
