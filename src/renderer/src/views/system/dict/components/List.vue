@@ -2,39 +2,37 @@
 <script lang="tsx" setup>
 import { ref, reactive } from 'vue'
 import { UserType } from '@api/user/types'
-import { useDictStore } from '@store/dictStore'
-import { Dictionary } from '@api/dictionary/types'
+import { DictType, DictTypePagePayloadType } from '@api/dictionary/types'
 import EffectDialog from './EffectDialog.vue'
 import { useConfirm } from '@hooks/useConfirm'
-import { ElTable, ElTableColumn, ElTag, TableColumnCtx, ElButton } from 'element-plus'
+import { ElTable, ElTableColumn, TableColumnCtx, ElButton } from 'element-plus'
 import { useResetForm } from '@hooks/useResetForm'
-import { delPostApi, getPostPageApi } from '@api/post'
-import { GetPostPagePayloadType, PostType } from '@api/post/types'
 import { FunctionalComponent } from 'vue'
 import { onMounted } from 'vue'
-import { Delete, Edit, View } from '@element-plus/icons-vue'
-
-const { postDict } = useDictStore()
+import { Delete, Edit } from '@element-plus/icons-vue'
+import { delDictTypeApi, getDictTypePageApi } from '@api/dictionary'
+import { unref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useDictStore } from '@store/dictStore'
 
 /** ------- 搜索 -------  */
 
-const formData = reactive<GetPostPagePayloadType>({
+const formData = reactive<DictTypePagePayloadType>({
   current: 1,
   size: 10,
-  postName: '',
-  postCode: '',
-  enabled: ''
+  name: '',
+  type: ''
 })
 
 // 搜索
 const onSubmit = async () => {
-  getTableData()
+  await getTableData()
 }
 // 重置
-const onReset = () => {
+const onReset = async () => {
   useResetForm(formData, { omit: ['current', 'size'] })
 
-  getTableData()
+  await getTableData()
 }
 
 /** ------- 搜索 -------  */
@@ -43,26 +41,21 @@ const onReset = () => {
 
 // 获取用户列表
 // table数据
+
 // 格式化时间戳
 const formatter = (_row: UserType, _column: TableColumnCtx<UserType>, timeNum: Date) => {
   const timestamp = new Date(timeNum)
   return `${timestamp.toLocaleDateString()} ${timestamp.toLocaleTimeString()}`
 }
 
-const tableData = ref<PostType[]>([])
+// table数据
+const tableData = ref<DictType[]>([])
+// table页数
 const count = ref<number>(0)
 
-const onSizeChange = (pagesize: number) => {
-  formData.size = pagesize
-  getTableData()
-}
-const onCurrentChange = (current: number) => {
-  formData.current = current
-  getTableData()
-}
-
+// 获取table数据
 const getTableData = async () => {
-  const res = await getPostPageApi(formData)
+  const res = await getDictTypePageApi(formData)
 
   if (res.code == '200') {
     tableData.value = res.data.records
@@ -70,32 +63,59 @@ const getTableData = async () => {
   }
 }
 
+// 全选
+const handleSelectionChange = () => {}
+
+// 每页显示
+const onSizeChange = (pagesize: number) => {
+  formData.size = pagesize
+  getTableData()
+}
+// 当前页
+const onCurrentChange = (current: number) => {
+  formData.current = current
+  getTableData()
+}
+
+const router = useRouter()
+
+// table 列配置
+
+const { dictComparison } = useDictStore()
+
 const columns: Partial<TableColumnCtx<any>>[] = [
-  { prop: 'postName', label: '岗位名称', minWidth: '200' },
-  { prop: 'postCode', label: '岗位编码', minWidth: '200' },
-  { prop: 'sort', label: '岗位排序', minWidth: '200' },
+  { prop: 'name', label: '字典类型名称', minWidth: '200' },
   {
-    prop: 'enabled',
-    label: '启用状态',
+    prop: 'type',
+    label: '分类编码',
     minWidth: '200',
-    renderCell({ enabled }: PostType) {
-      return <ElTag type={enabled ? '' : 'danger'}>{['禁用', '启用'][enabled]}</ElTag>
+    renderCell(row: DictType) {
+      const onJump = (row: DictType) => {
+        dictComparison.set('current', row.type)
+        router.push({
+          path: '/system/dict-item'
+        })
+      }
+
+      return (
+        <ElButton link={true} type="primary" onClick={() => onJump(row)}>
+          {row.type}
+        </ElButton>
+      )
     }
   },
+  { prop: 'remarks', label: '字典描述', minWidth: '200' },
   { prop: 'createTime', label: '创建时间', minWidth: '200', formatter: formatter },
   {
     label: '操作',
     minWidth: '250',
     fixed: 'right',
     align: 'center',
-    renderCell: (row: PostType) => {
+    renderCell: (row: DictType) => {
       // 查看用户详情
 
       return (
         <>
-          <ElButton type="primary" size="small" onClick={() => handleLook(row)} link icon={View}>
-            查看
-          </ElButton>
           <ElButton type="primary" size="small" onClick={() => handleEdit(row)} link icon={Edit}>
             编辑
           </ElButton>
@@ -108,14 +128,16 @@ const columns: Partial<TableColumnCtx<any>>[] = [
   }
 ]
 
-const TsxTable: FunctionalComponent = (props: any) => {
+// table TSX渲染
+const TsxTable: FunctionalComponent = () => {
+  const tableDatas = unref(tableData.value)
+
   return (
     <ElTable
-      data={props.data}
+      data={tableDatas}
       className="flex-1 !h-full"
       border
       onCurrent-change={handleSelectionChange}
-      rowKey={props.data.id}
     >
       <ElTableColumn type="selection" width="50" />
 
@@ -130,7 +152,7 @@ const TsxTable: FunctionalComponent = (props: any) => {
           columnKey=""
         >
           {{
-            default: (scope: { row: PostType }) =>
+            default: (scope: { row: DictType }) =>
               item.renderCell ? item.renderCell(scope.row) : null
           }}
         </ElTableColumn>
@@ -139,72 +161,53 @@ const TsxTable: FunctionalComponent = (props: any) => {
   )
 }
 
-// 全选
-const handleSelectionChange = () => {}
-
 /** ------- 表格 -------  */
 
 /** ------- 操作 -------  */
 
-// 字典
-const status = reactive<Dictionary[]>([])
-const gender = reactive<Dictionary[]>([])
-
-type Dict = ['system_global_gender', 'system_global_status']
-
-onMounted(async () => {
-  const dist = await postDict<Dict>(['system_global_gender', 'system_global_status'])
-
-  Object.assign(status, dist.system_global_status)
-  Object.assign(gender, dist.system_global_gender)
-
-  getTableData()
-})
-
-// 新增用户
-
+// dialog类型 新增/查看/编辑
 enum EffectStatus {
   add,
   look,
   edit
 }
 
-// const EffectDialogStatus = ref<EffectStatus>(EffectStatus.add) // 默认添加
+const effectDialogRef = ref()
 
+// 新增
 const handleAdd = (): void => {
   effectDialogRef.value.dialogStatus = EffectStatus.add
   effectDialogRef.value.visible = true
 }
 
-// 查看用户详情
-const handleLook = (row: PostType): void => {
-  effectDialogRef.value.dialogStatus = EffectStatus.look
-  effectDialogRef.value.visible = true
-  Object.assign(effectDialogRef.value.formData, { ...row, enabled: row.enabled.toString() })
-}
+// // 查看
+// const handleLook = (row: PostType): void => {
+//   effectDialogRef.value.dialogStatus = EffectStatus.look
+//   effectDialogRef.value.visible = true
+//   Object.assign(effectDialogRef.value.formData, { ...row, enabled: row.enabled.toString() })
+// }
 
-const handleEdit = (row: PostType): void => {
+// 编辑
+const handleEdit = (row: DictType): void => {
   effectDialogRef.value.dialogStatus = EffectStatus.edit
   effectDialogRef.value.visible = true
-  effectDialogRef.value.id = row.id
   Object.assign(effectDialogRef.value.formData, {
-    postName: row.postName,
-    postCode: row.postCode,
-    sort: row.sort,
-    remark: row.remark,
-    enabled: row.enabled.toString()
+    id: row.id,
+    name: row.name,
+    type: row.type,
+    remarks: row.remarks
   })
 }
 
 // 删除
-const handleDel = (row: PostType) => {
-  useConfirm(row.id, delPostApi, getTableData)
+const handleDel = (row: DictType) => {
+  useConfirm(row.id, delDictTypeApi, getTableData)
 }
 /** ------- 操作 -------  */
 
-/** ------- dialog -------  */
-const effectDialogRef = ref()
-/** ------- dialog -------  */
+onMounted(async () => {
+  getTableData()
+})
 
 defineExpose({
   getTableData,
@@ -216,14 +219,11 @@ defineExpose({
     <!-- 筛选 -->
     <el-card shadow="never" class="mb-5 flex items-center" body-class="w-full">
       <el-form ref="form" :model="formData" label-width="80" class="-mb-5 flex flex-wrap">
-        <el-form-item label="用户名称">
-          <el-input v-model="formData.postName" placeholder="请输入机构名称"></el-input>
+        <el-form-item label="字典名称" prop="name">
+          <el-input v-model="formData.name" placeholder="请输入字典名称"></el-input>
         </el-form-item>
-        <el-form-item label="状态">
-          <el-select v-model="formData.enabled" placeholder="请选择启用状态" clearable filterable>
-            <el-option v-for="item in status" :key="item.id" :label="item.k" :value="item.v">
-            </el-option>
-          </el-select>
+        <el-form-item label="类型编码" prop="type">
+          <el-input v-model="formData.type" placeholder="请输入分类编码"></el-input>
         </el-form-item>
 
         <el-form-item label-width="10" label=" ">
@@ -240,7 +240,8 @@ defineExpose({
         <el-button type="primary" icon="Plus" @click="handleAdd">新增</el-button>
       </div>
 
-      <TsxTable :data="tableData"></TsxTable>
+      <TsxTable></TsxTable>
+      <!-- 分页 -->
       <Pagination
         :current="formData.current"
         :size="formData.size"
@@ -248,14 +249,11 @@ defineExpose({
         @size-change="onSizeChange"
         @current-change="onCurrentChange"
       ></Pagination>
+      <!-- 分页 -->
     </el-card>
     <!-- table -->
 
-    <!-- dialog -->
-    <!-- <teleport to="#app"> -->
-    <EffectDialog ref="effectDialogRef" :refresh="getTableData" :status="status" />
-    <!-- </teleport> -->
-    <!-- dialog -->
+    <EffectDialog ref="effectDialogRef" :refresh="getTableData" />
   </div>
 </template>
 

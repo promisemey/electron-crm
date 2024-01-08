@@ -6,6 +6,8 @@ import { reactive } from 'vue'
 export const useDictStore = defineStore('dictStore', () => {
   const dict = reactive({})
 
+  const dictComparison = reactive(new Map())
+
   // 批量查询字典
   const postDict = async <T extends string[]>(query: string[]) => {
     const field = query.filter((item) => dict[item])
@@ -22,6 +24,7 @@ export const useDictStore = defineStore('dictStore', () => {
 
   return {
     postDict,
-    dict
+    dict,
+    dictComparison
   }
 })

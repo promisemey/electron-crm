@@ -19,6 +19,8 @@ router.beforeEach(async (to, _from, next) => {
     // 加载动态路由
     await getMenuInfo()
 
+    // console.log(router.getRoutes())
+
     if (!to.redirectedFrom) {
       next({ ...to, replace: true })
     } else {
@@ -37,5 +39,5 @@ router.beforeEach(async (to, _from, next) => {
 
 // 全局后置导航守卫
 router.afterEach(() => {
-  console.log('前置')
+  // console.log('后置')
 })

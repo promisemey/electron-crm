@@ -14,14 +14,16 @@ const onCurrentChange = (current: number) => {
 
 withDefaults(
   defineProps<{
-    current: number
-    size: number
-    count: number
+    current?: number
+    size?: number
+    count?: number
+    hideOnSinglePage?: boolean
   }>(),
   {
     current: 1,
     size: 10,
-    count: 1
+    count: 1,
+    hideOnSinglePage: false
   }
 )
 </script>
@@ -31,7 +33,7 @@ withDefaults(
       :current-page="+current"
       :page-size="+size"
       background
-      hide-on-single-page
+      :hide-on-single-page="hideOnSinglePage"
       layout="sizes, prev, pager, next, jumper"
       :page-count="+count"
       @size-change="onSizeChange"

@@ -82,7 +82,7 @@ export const useMenuStore = defineStore(
     const getMenuInfo = async () => {
       // 本地无数据
 
-      console.log(!dyRoutes.value.length, 'route-')
+      // console.log(!dyRoutes.value.length, 'route-')
 
       if (!dyRoutes.value.length) {
         const res = useUserStore()
@@ -92,7 +92,7 @@ export const useMenuStore = defineStore(
         if (rolePerm.value) {
           const menuInfo = await getMenuInfoApi(rolePerm.value)
 
-          console.log(menuInfo, '========')
+          // console.log(menuInfo, '========')
 
           if (menuInfo.code == '200') {
             dyRoutes.value = addRouteDy(menuInfo.data)

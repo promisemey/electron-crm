@@ -2,7 +2,7 @@
 <script lang="tsx" setup>
 import { ref, reactive } from 'vue'
 import { UserType } from '@api/user/types'
-import { DictType, DictTypePagePayloadType } from '@api/dictionary/types'
+import { DictItem, DictItemPagePayloadType, DictType } from '@api/dictionary/types'
 import EffectDialog from './EffectDialog.vue'
 import { useConfirm } from '@hooks/useConfirm'
 import { ElTable, ElTableColumn, TableColumnCtx, ElButton } from 'element-plus'
@@ -10,27 +10,47 @@ import { useResetForm } from '@hooks/useResetForm'
 import { FunctionalComponent } from 'vue'
 import { onMounted } from 'vue'
 import { Delete, Edit } from '@element-plus/icons-vue'
-import { delDictTypeApi, getDictTypePageApi } from '@api/dictionary'
+import { delDictTypeApi, getDictItemPageApi, getDictTypePageApi } from '@api/dictionary'
 import { unref } from 'vue'
+import { useRoute } from 'vue-router'
+import { onActivated } from 'vue'
+import { useDictStore } from '@store/dictStore'
 
 /** ------- 搜索 -------  */
+// 字典名称数组
 
-const formData = reactive<DictTypePagePayloadType>({
+const formData = reactive<DictItemPagePayloadType>({
   current: 1,
   size: 10,
-  name: '',
-  type: ''
+  dictType: '',
+  key: '',
+  value: ''
 })
+
+// select
+const handleSelect = (_value) => {}
 
 // 搜索
 const onSubmit = async () => {
-  getTableData()
+  await getTableData()
+
+  // 获取字典类型
+  const dict = dictComparison.get(formData.dictType)
+
+  // 设置当前字典项
+  dictComparison.set('current', formData.dictType)
+
+  if (dict) {
+    effectDialogRef.value.dictType = `${dict.name}(${formData.dictType})`
+    // typeId
+    effectDialogRef.value.formData.typeId = dict.id
+  }
 }
 // 重置
-const onReset = () => {
-  useResetForm(formData, { omit: ['current', 'size'] })
+const onReset = async () => {
+  useResetForm(formData, { omit: ['current', 'size', 'dictType'] })
 
-  getTableData()
+  await getTableData()
 }
 
 /** ------- 搜索 -------  */
@@ -47,13 +67,13 @@ const formatter = (_row: UserType, _column: TableColumnCtx<UserType>, timeNum: D
 }
 
 // table数据
-const tableData = ref<DictType[]>([])
+const tableData = ref<DictItem[]>([])
 // table页数
 const count = ref<number>(0)
 
 // 获取table数据
 const getTableData = async () => {
-  const res = await getDictTypePageApi(formData)
+  const res = await getDictItemPageApi(formData)
 
   if (res.code == '200') {
     tableData.value = res.data.records
@@ -61,34 +81,58 @@ const getTableData = async () => {
   }
 }
 
+// 字典类型名称列表
+const dictName = ref<DictType[]>([])
+
+// dict比对表
+const { dictComparison } = useDictStore()
+
+// 字典类型名称列表
+const getDictType = async () => {
+  if (dictComparison?.get('dictTypePage'))
+    return (dictName.value = dictComparison?.get('dictTypePage'))
+
+  const res = await getDictTypePageApi({ current: 1, size: 999 })
+  if (res.code == '200') {
+    dictName.value = res.data.records
+
+    // 存入
+    res.data.records.forEach((item) => {
+      dictComparison.has(item.type) ||
+        dictComparison.set(item.type, { name: item.name, id: item.id })
+    })
+
+    dictComparison.set('dictTypePage', res.data.records)
+  }
+}
+
 // 全选
 const handleSelectionChange = () => {}
 
 // 每页显示
-const onSizeChange = (pagesize: number) => {
+const onSizeChange = async (pagesize: number) => {
   formData.size = pagesize
-  getTableData()
+  await getTableData()
 }
 // 当前页
-const onCurrentChange = (current: number) => {
+const onCurrentChange = async (current: number) => {
   formData.current = current
-  getTableData()
+  await getTableData()
 }
 
 // table 列配置
 const columns: Partial<TableColumnCtx<any>>[] = [
-  { prop: 'name', label: '字典类型名称', minWidth: '200' },
-  { prop: 'type', label: '分类编码', minWidth: '200' },
-  { prop: 'remarks', label: '字典描述', minWidth: '200' },
+  { prop: 'k', label: '字典键名', minWidth: '200' },
+  { prop: 'v', label: '字典键值', minWidth: '200' },
+  { prop: 'sort', label: '排序', minWidth: '200' },
+  { prop: 'remark', label: '字典描述', minWidth: '200' },
   { prop: 'createTime', label: '创建时间', minWidth: '200', formatter: formatter },
   {
     label: '操作',
     minWidth: '250',
     fixed: 'right',
     align: 'center',
-    renderCell: (row: DictType) => {
-      // 查看用户详情
-
+    renderCell: (row: DictItem) => {
       return (
         <>
           <ElButton type="primary" size="small" onClick={() => handleEdit(row)} link icon={Edit}>
@@ -149,39 +193,58 @@ enum EffectStatus {
 
 const effectDialogRef = ref()
 
+// 字典类型  名称/类别
+// const getDictTypeDetail = async (id: string) => {
+//   const res = await getDictTypeDetailApi(id)
+//   if (res.code != '200') return ''
+//   return `${res.data.name}(${res.data.type})`
+// }
+
 // 新增
 const handleAdd = (): void => {
   effectDialogRef.value.dialogStatus = EffectStatus.add
   effectDialogRef.value.visible = true
 }
 
-// // 查看
-// const handleLook = (row: PostType): void => {
-//   effectDialogRef.value.dialogStatus = EffectStatus.look
-//   effectDialogRef.value.visible = true
-//   Object.assign(effectDialogRef.value.formData, { ...row, enabled: row.enabled.toString() })
-// }
-
 // 编辑
-const handleEdit = (row: DictType): void => {
+const handleEdit = async (row: DictItem): Promise<void> => {
+  // effectDialogRef.value.dictType = await getDictTypeDetail(row.typeId)
+
+  effectDialogRef.value.dictType
+
   effectDialogRef.value.dialogStatus = EffectStatus.edit
   effectDialogRef.value.visible = true
-  Object.assign(effectDialogRef.value.formData, {
-    id: row.id,
-    name: row.name,
-    type: row.type,
-    remarks: row.remarks
-  })
+  Object.assign(effectDialogRef.value.formData, { ...row, v: +row.v })
 }
 
 // 删除
-const handleDel = (row: DictType) => {
+const handleDel = (row: DictItem) => {
   useConfirm(row.id, delDictTypeApi, getTableData)
 }
 /** ------- 操作 -------  */
 
+// 接收传递的query参数
+const route = useRoute()
+
+type Query = { typeId: string; name: string; type: string }
+
+const query = route.query as Query
+
+onActivated(async () => {
+  formData.dictType = dictComparison.get('current') || ''
+  await getTableData()
+})
+
+// onDeactivated(() => {
+//   dictComparison.delete('current')
+//   console.log(dictComparison)
+// })
+
 onMounted(async () => {
-  getTableData()
+  formData.dictType = dictComparison.get('current') || ''
+
+  await getDictType()
+  await getTableData()
 })
 
 defineExpose({
@@ -195,10 +258,28 @@ defineExpose({
     <el-card shadow="never" class="mb-5 flex items-center" body-class="w-full">
       <el-form ref="form" :model="formData" label-width="80" class="-mb-5 flex flex-wrap">
         <el-form-item label="字典名称" prop="name">
-          <el-input v-model="formData.name" placeholder="请输入字典名称"></el-input>
+          <el-select
+            v-model="formData.dictType"
+            value-key=""
+            placeholder=""
+            clearable
+            filterable
+            @change="handleSelect"
+          >
+            <el-option
+              v-for="item in dictName"
+              :key="item.id"
+              :label="item.name"
+              :value="item.type"
+            >
+            </el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item label="类型编码" prop="type">
-          <el-input v-model="formData.type" placeholder="请输入分类编码"></el-input>
+        <el-form-item label="字典键" prop="key">
+          <el-input v-model="formData.key" placeholder="请输入字典键"></el-input>
+        </el-form-item>
+        <el-form-item label="字典值" prop="value">
+          <el-input v-model="formData.value" placeholder="请输入字典值"></el-input>
         </el-form-item>
 
         <el-form-item label-width="10" label=" ">
@@ -211,7 +292,8 @@ defineExpose({
 
     <!-- table -->
     <el-card shadow="never" class="flex-1" body-class="flex flex-col">
-      <div class="mb-4">
+      {{ dictComparison.get('current') }}
+      <div v-if="dictComparison.get('current')" class="mb-4">
         <el-button type="primary" icon="Plus" @click="handleAdd">新增</el-button>
       </div>
 
@@ -228,7 +310,7 @@ defineExpose({
     </el-card>
     <!-- table -->
 
-    <EffectDialog ref="effectDialogRef" :refresh="getTableData" />
+    <EffectDialog ref="effectDialogRef" :refresh="getTableData" :type-params="query" />
   </div>
 </template>
 

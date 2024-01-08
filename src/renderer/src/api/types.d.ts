@@ -3,11 +3,16 @@ export interface ResType {
   msg: string
 }
 
+export interface BasePayload {
+  current: number
+  size: number
+}
+
 export interface PageDataType {
   total: number | string
   size: number | string
   current: number | string
-  orders?: Array
+  orders?: string[]
   optimizeCountSql?: boolean
   searchCount?: boolean
   countId?: unknown

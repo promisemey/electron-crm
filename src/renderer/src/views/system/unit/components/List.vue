@@ -90,6 +90,9 @@ enum EffectStatus {
 const handleAdd = () => {
   effectDialogRef.value.dialogStatus = EffectStatus.add
   effectDialogRef.value.visible = true
+
+  // 清空编辑时存留数据
+  useResetForm(effectDialogRef.value.formData)
 }
 
 // 查看用户详情

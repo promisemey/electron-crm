@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import MoveWindows from '@components/MoveWindows.vue'
-import { ref } from 'vue'
 import PrimaryMenu from './components/menu/PrimaryMenu.vue'
 import MenuItem from './components/menu/MenuItem.vue'
 import Logo from '@components/Logo.vue'
@@ -16,10 +15,6 @@ onMounted(() => {
     /* empty */
   }
 })
-
-const tagMenuRef = ref()
-
-console.log(tagMenuRef)
 </script>
 
 <template>

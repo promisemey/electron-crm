@@ -161,17 +161,14 @@ onActivated(async () => {
 
   if (query.userId) {
     localStorage.setItem('user-assign', JSON.stringify(query))
-    console.log('set => ', query)
   }
 
   if (!query.userId) {
     const localUserAssign = localStorage.getItem('user-assign')
     Object.assign(query, localUserAssign ? JSON.parse(localUserAssign) : {})
-    console.log('get => ', query)
   }
 
   getTableData()
-  console.log(checkMap)
 })
 
 onDeactivated(() => {

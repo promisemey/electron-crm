@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
-import { onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const i18n = useI18n()
@@ -11,9 +10,9 @@ const locale = computed(() => {
   return i18n.messages.value[i18n.locale.value].el
 })
 
-onMounted(() => {
-  console.log(i18n, '----')
-})
+// onMounted(() => {
+//   console.log(i18n, '----')
+// })
 </script>
 <template>
   <!-- <div class="drag"></div> -->
