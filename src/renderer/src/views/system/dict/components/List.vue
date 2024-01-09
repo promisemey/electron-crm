@@ -28,6 +28,7 @@ const formData = reactive<DictTypePagePayloadType>({
 const onSubmit = async () => {
   await getTableData()
 }
+
 // 重置
 const onReset = async () => {
   useResetForm(formData, { omit: ['current', 'size'] })
@@ -81,7 +82,7 @@ const router = useRouter()
 
 // table 列配置
 
-const { dictComparison } = useDictStore()
+const { setInitDictComparison, setDictComparison, dictComparison } = useDictStore()
 
 const columns: Partial<TableColumnCtx<any>>[] = [
   { prop: 'name', label: '字典类型名称', minWidth: '200' },
@@ -200,13 +201,20 @@ const handleEdit = (row: DictType): void => {
 }
 
 // 删除
-const handleDel = (row: DictType) => {
-  useConfirm(row.id, delDictTypeApi, getTableData)
+const handleDel = async (row: DictType) => {
+  const res = await useConfirm(row.id, delDictTypeApi, getTableData)
+
+  if (res) await setDictComparison(row.type)
+
+  // setDictComparison(row.type)
 }
 /** ------- 操作 -------  */
 
 onMounted(async () => {
-  getTableData()
+  await getTableData()
+  await setInitDictComparison()
+
+  console.log(dictComparison, '=====')
 })
 
 defineExpose({

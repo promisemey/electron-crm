@@ -2,9 +2,10 @@
 <script lang="tsx" setup>
 import { DictItemPayloadType } from '@api/dictionary/types'
 import { ElDialog, ElForm, ElFormItem, ElInput, FormInstance, FormRules } from 'element-plus'
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { useResetForm } from '@hooks/useResetForm'
 import { postDictItemApi, updateDictItemApi } from '@api/dictionary'
+import { useDictStore } from '@store/dictStore'
 
 // dialog 新增/编辑/查看
 enum EffectStatus {
@@ -53,6 +54,17 @@ const formRules = reactive<FormRules<DictItemPayloadType>>({
   sort: [{ required: true, message: '字典排序为空！', trigger: 'blur' }]
 })
 
+const { dictComparison } = useDictStore()
+
+// 字典类型
+const dictName = computed(() => {
+  const current = dictComparison.get('current') as string
+  if (!current) return ''
+  const dict = dictComparison.get(current)
+
+  return `${dict.name}(${current})`
+})
+
 // 提交
 const handleSubmit = (formEl: FormInstance | undefined) => {
   if (!formEl) return
@@ -60,6 +72,8 @@ const handleSubmit = (formEl: FormInstance | undefined) => {
   formEl.validate(async (valid) => {
     if (valid) {
       let res
+      formData.typeId = dictComparison.get(dictComparison.get('current')).id
+      console.log(formData.typeId, '-----------')
 
       switch (dialogStatus.value) {
         case EffectStatus.add:
@@ -139,7 +153,7 @@ defineExpose({
     >
       <el-form-item label="字典类型" prop="typeId">
         <el-input v-model="formData.typeId" type="hidden" placeholder="请输入字典名称"></el-input>
-        <el-input :value="dictType" disabled placeholder="请输入字典名称"></el-input>
+        <el-input :value="dictName" disabled placeholder="请输入字典名称"></el-input>
       </el-form-item>
       <el-form-item label="字典键" prop="k">
         <el-input v-model="formData.k" placeholder="请输入字典名称"></el-input>

@@ -69,7 +69,7 @@ export const updateDictItemApi = (params: DictItemPayloadType & { id: string }) 
 
 // 删除字典项
 export const delDictItemApi = (id: string) => {
-  return request.get<ResType>(`/system/dict/type/delete/${id}`)
+  return request.get<ResType>(`/system/dict/item/delete/${id}`)
 }
 
 // 查询字典项列表
