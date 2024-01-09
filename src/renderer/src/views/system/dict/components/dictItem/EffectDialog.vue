@@ -1,6 +1,6 @@
 <!-- eslint-disable @typescript-eslint/no-explicit-any -->
 <script lang="tsx" setup>
-import { DictItemPayloadType } from '@api/dictionary/types'
+import { DictItem, DictItemPayloadType } from '@api/dictionary/types'
 import { ElDialog, ElForm, ElFormItem, ElInput, FormInstance, FormRules } from 'element-plus'
 import { ref, reactive, computed } from 'vue'
 import { useResetForm } from '@hooks/useResetForm'
@@ -54,15 +54,21 @@ const formRules = reactive<FormRules<DictItemPayloadType>>({
   sort: [{ required: true, message: '字典排序为空！', trigger: 'blur' }]
 })
 
-const { dictComparison } = useDictStore()
+const { getCurrentDictType } = useDictStore()
 
 // 字典类型
 const dictName = computed(() => {
-  const current = dictComparison.get('current') as string
-  if (!current) return ''
-  const dict = dictComparison.get(current)
+  // const current = dictComparison.get('current') as bigint
 
-  return `${dict.name}(${current})`
+  // if (!current) return ''
+
+  // const dict = dictComparison.get(current) as ResiVal
+
+  // return dict.dictNameType
+
+  // console.log(getCurrentDictType(), '==========')
+
+  return getCurrentDictType()?.dictNameType ?? ''
 })
 
 // 提交
@@ -72,11 +78,11 @@ const handleSubmit = (formEl: FormInstance | undefined) => {
   formEl.validate(async (valid) => {
     if (valid) {
       let res
-      formData.typeId = dictComparison.get(dictComparison.get('current')).id
       console.log(formData.typeId, '-----------')
 
       switch (dialogStatus.value) {
         case EffectStatus.add:
+          formData.typeId = getCurrentDictType().id
           res = await postDictItemApi(formData)
           break
         case EffectStatus.edit:
@@ -110,11 +116,6 @@ const handleReset = (formEl: FormInstance | undefined) => {
   // if (!formEl) return
 }
 
-const props = defineProps<{
-  refresh: () => Promise<void>
-  //   typeParams: { typeId: string; name: string; type: string }
-}>()
-
 const onBeforeClose = () => {
   // 关闭前清空数据
   useResetForm(formData, { omit: ['sort'] })
@@ -127,6 +128,11 @@ const dictType = ref<string>('')
 // const dictType = computed(() => {
 //   return `${props.typeParams.name}(${props.typeParams.type})`
 // })
+
+const props = defineProps<{
+  refresh: () => Promise<DictItem[]>
+  //   typeParams: { typeId: string; name: string; type: string }
+}>()
 
 defineExpose({
   visible,

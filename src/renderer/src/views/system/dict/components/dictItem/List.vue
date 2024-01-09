@@ -28,23 +28,42 @@ const formData = reactive<DictItemPagePayloadType>({
 })
 
 // select
-const handleSelect = (_value) => {}
+const handleSelect = (value: string) => {
+  // 设置临时 current
+  // const dictType = dictComparison.get(BigInt(value)) as ResiVal
+  // const tempCurrent = dictComparison.set('tempCurrent', dictType)
+  formData.dictType = value
+
+  // console.log(dictType, '--------')
+}
 
 // 搜索
-const onSubmit = async () => {
-  await getTableData()
+const onSubmit = async (): Promise<boolean> => {
+  const res = await getTableData()
+  // 设置 父 字典类型的Id
+  if (!res.length || !formData.dictType) return dictComparison.delete('current')
+
+  console.log(!res.length || !formData.dictType)
+
+  dictComparison.set('current', BigInt(res[0].typeId))
+  return true
+  // if (res) {
+  //   const tempCurrent = dictComparison.get('tempCurrent') as bigint
+
+  //   dictComparison.set('current', tempCurrent)
+  // }
 
   // 获取字典类型
-  const dict = dictComparison.get(formData.dictType!)
+  // const dict = dictComparison.get(formData.dictType!)
 
   // 设置当前字典项
-  dictComparison.set('current', formData.dictType!)
+  // dictComparison.set('current', formData.dictType!)
 
-  if (dict) {
-    effectDialogRef.value.dictType = `${dict.name}(${formData.dictType})`
-    // typeId
-    effectDialogRef.value.formData.typeId = dict.id
-  }
+  // if (dict) {
+  //   effectDialogRef.value.dictType = `${dict.name}(${formData.dictType})`
+  //   // typeId
+  //   effectDialogRef.value.formData.typeId = dict.id
+  // }
 }
 
 // 重置
@@ -73,20 +92,26 @@ const tableData = ref<DictItem[]>([])
 const count = ref<number>(0)
 
 // 获取table数据
-const getTableData = async () => {
+const getTableData = async (): Promise<DictItem[]> => {
   const res = await getDictItemPageApi(formData)
 
   if (res.code == '200') {
-    tableData.value = res.data.records
+    const records = res.data.records
+
+    tableData.value = records
     count.value = +res.data.pages
+
+    return records
   }
+
+  return []
 }
 
 // 字典类型名称列表
 // const dictName = ref<DictType[]>([])
 
 // dict比对表
-const { dictComparison } = useDictStore()
+const { dictComparison, setInitDictComparison } = useDictStore()
 
 // 字典类型名称列表
 // const getDictType = async () => {
@@ -218,8 +243,8 @@ const handleEdit = async (row: DictItem): Promise<void> => {
   // effectDialogRef.value.dictType = await getDictTypeDetail(row.typeId)
 
   console.log(row, 'row')
-
-  effectDialogRef.value.dictType
+  dictComparison.set('current', BigInt(row.typeId))
+  // effectDialogRef.value.dictType
 
   effectDialogRef.value.dialogStatus = EffectStatus.edit
   effectDialogRef.value.visible = true
@@ -249,8 +274,16 @@ const dictTypePage = computed((): DictType[] => {
   return dictComparison.get('dictTypePage') as DictType[]
 })
 
+const { getCurrentDictType } = useDictStore()
+
 onActivated(async () => {
-  formData.dictType = dictComparison.get('current') || ''
+  // const current = dictComparison.get('current') as bigint
+
+  // const dictType = dictComparison.get(current) as ResiVal
+
+  if (!dictComparison.size) await setInitDictComparison()
+
+  formData.dictType = getCurrentDictType()?.type || ''
 
   await getTableData()
 })
@@ -268,8 +301,7 @@ defineExpose({
         <el-form-item label="字典名称" prop="name">
           <el-select
             v-model="formData.dictType"
-            value-key=""
-            placeholder=""
+            placeholder="请选择字典名称"
             clearable
             filterable
             @change="handleSelect"
@@ -300,6 +332,7 @@ defineExpose({
 
     <!-- table -->
     <el-card shadow="never" class="flex-1" body-class="flex flex-col">
+      {{ dictComparison.get('current') }}
       <div v-if="dictComparison.get('current')" class="mb-4">
         <el-button type="primary" icon="Plus" @click="handleAdd">新增</el-button>
       </div>

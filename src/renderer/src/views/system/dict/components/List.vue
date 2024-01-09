@@ -91,8 +91,9 @@ const columns: Partial<TableColumnCtx<any>>[] = [
     label: '分类编码',
     minWidth: '200',
     renderCell(row: DictType) {
+      // 跳转字典项
       const onJump = (row: DictType) => {
-        dictComparison.set('current', row.type)
+        dictComparison.set('current', BigInt(row.id))
         router.push({
           path: '/system/dict-item'
         })
@@ -204,7 +205,7 @@ const handleEdit = (row: DictType): void => {
 const handleDel = async (row: DictType) => {
   const res = await useConfirm(row.id, delDictTypeApi, getTableData)
 
-  if (res) await setDictComparison(row.type)
+  if (res) await setDictComparison(row.id)
 
   // setDictComparison(row.type)
 }
@@ -213,8 +214,6 @@ const handleDel = async (row: DictType) => {
 onMounted(async () => {
   await getTableData()
   await setInitDictComparison()
-
-  console.log(dictComparison, '=====')
 })
 
 defineExpose({
